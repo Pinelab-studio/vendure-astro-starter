@@ -1,5 +1,14 @@
 {
   "extends": "astro/tsconfigs/strict",
   "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"]
+  "exclude": ["dist"],
+  "compilerOptions": {
+    "plugins": [ 
+      { 
+        "name": "gql.tada/ts-plugin", 
+        "schema": "https://api.pinelab.studio/shop-api", 
+        "tadaOutputLocation": "./src/graphql-env.d.ts"
+      } 
+    ] 
+  }
 }
