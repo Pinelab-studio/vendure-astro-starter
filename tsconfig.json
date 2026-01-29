@@ -3,12 +3,12 @@
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"],
   "compilerOptions": {
-    "plugins": [ 
-      { 
-        "name": "gql.tada/ts-plugin", 
-        "schema": "https://api.pinelab.studio/shop-api", 
+    "plugins": [
+      {
+        "name": "gql.tada/ts-plugin",
+        "schema": "https://api.pinelab.studio/shop-api",
         "tadaOutputLocation": "./src/graphql-env.d.ts"
-      } 
-    ] 
+      }
+    ]
   }
 }

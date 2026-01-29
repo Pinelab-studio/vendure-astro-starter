@@ -1,0 +1,8 @@
+{
+  "en": {
+    "welcome": "Hello {username}"
+  },
+  "nl": {
+    "welcome": "Hallo {username}"
+  }
+}

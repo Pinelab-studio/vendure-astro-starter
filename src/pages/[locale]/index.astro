@@ -1,39 +1,44 @@
 ---
-import { m } from "../../paraglide-i18n/messages";
-import request from 'graphql-request';
+import "../../styles/global.css";
+import request from "graphql-request";
 
-import { graphql } from 'gql.tada';
+import { graphql } from "gql.tada";
 
 const ProductsList = graphql(`
- query {
-	products(options: { skip: 0, take: 10 }) {
-		items {
-			id
-			name
-		}
-	}
- }
+  query {
+    products(options: { skip: 0, take: 10 }) {
+      items {
+        id
+        name
+      }
+    }
+  }
 `);
 
-const data = await request('https://api.pinelab.studio/shop-api', ProductsList);
+const data = await request("https://api.pinelab.studio/shop-api", ProductsList);
 ---
 
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-		<p>{m.welcome({ username: "Martijn" })}</p>
-		<ul>
-			{data.products.items.map((product: any) => (
-				<li>{product}</li>
-			))}
-		</ul>
-	</body>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Astro</title>
+  </head>
+  <body>
+    <h1>Astro</h1>
+    <p>{Astro.locals.m.welcome({ username: "Martijn" })}</p>
+    <ul>
+      {
+        data.products.items.map((product: any) => (
+          <li>
+            {JSON.stringify(product)}
+            <button class="btn btn-primary">Button</button>
+          </li>
+        ))
+      }
+    </ul>
+  </body>
 </html>

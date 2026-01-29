@@ -1,5 +1,6 @@
 declare namespace App {
-    interface Locals {
-        locale: string;
-    }
+  interface Locals {
+    locale: string;
+    m: LocaleMessageFunctions;
   }
+}
