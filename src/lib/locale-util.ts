@@ -1,52 +1,28 @@
-import messagesJson from "../messages.json";
 
 // This util is responsible for loading locale messages and replacing placeholders in template strings.
 
-/**
- * The type of the locale messages, inferred from messages.json.
- */
-export type LocaleMessages = (typeof messagesJson)[keyof typeof messagesJson];
+
 /**
  * The type of all message functions.
  * Example: `m.welcome()`, `m.hero()` etc.
  */
-export type LocaleMessageFunctions = {
-  [K in keyof LocaleMessages]: (params: Record<string, string>) => string;
+export type LocaleMessageFunctions<T> = {
+  [K in keyof T]: (params: Record<string, string>) => string;
 };
-
-/**
- * Load locale messages from the messages.json file.
- * Returns a map of locale to locale messages, e.g, { "en": { "welcome": "Hello" }, "nl": { "welcome": "Hallo" } }
- */
-export function loadAllLocaleMessages(
-  supportedLocales: string[],
-): Record<string, LocaleMessages> {
-  const messages: Record<string, LocaleMessages> = {};
-  supportedLocales.forEach((locale) => {
-    const localeMessages = messagesJson[locale as keyof typeof messagesJson];
-    if (!localeMessages) {
-      throw new Error(
-        `No messages found for locale '${locale}' in messages.json`,
-      );
-    }
-    messages[locale] = localeMessages;
-  });
-  return messages;
-}
 
 /**
  * Creates message functions for each key in messages.json.
  * Example: `m.welcome({ username: "Martijn" })` => `Hello Martijn`
  */
-export function createMessageFn(
-  localeMessages: LocaleMessages,
-): LocaleMessageFunctions {
-  const result: Record<string, (params: Record<string, string>) => string> = {};
-  for (const key in localeMessages) {
-    const template = localeMessages[key as keyof LocaleMessages] as string;
+export function createMessageFn<T extends Record<string, string>>(
+  messages: T,
+): LocaleMessageFunctions<T> {
+  const result: Record<keyof T, (params: Record<string, string>) => string> = {} as any;
+  for (const key in messages) {
+    const template = messages[key as keyof T] as string;
     result[key] = createTemplateFn(template);
   }
-  return result as LocaleMessageFunctions;
+  return result;
 }
 
 /**
