@@ -1,6 +1,14 @@
+@import "@fontsource/sen/latin-400.css";
+@import "@fontsource/sen/latin-500.css";
+@import "@fontsource/sen/latin-600.css";
+@import "@fontsource/sen/latin-700.css";
 @import "tailwindcss";
 @plugin "daisyui" {
   themes: light --default;
+}
+
+:root {
+  font-family: "Sen", sans-serif;
 }
 
 /* Mobile menu toggle */
@@ -23,7 +31,7 @@
   --color-base-200: oklch(95% 0 0);
   --color-base-300: oklch(92% 0 0);
   --color-base-content: oklch(20% 0 0);
-  --color-primary: oklch(87% 0 0);
+  --color-primary: oklch(0.9167 0.1491 119.91);
   --color-primary-content: oklch(26% 0 0);
   --color-secondary: oklch(87% 0 0);
   --color-secondary-content: oklch(26% 0 0);

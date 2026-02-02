@@ -1,7 +1,12 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist"],
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist"
+  ],
   "compilerOptions": {
     "plugins": [
       {
@@ -9,6 +14,8 @@
         "schema": "https://api.pinelab.studio/shop-api",
         "tadaOutputLocation": "./src/graphql-env.d.ts"
       }
-    ]
+    ],
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
   }
 }
