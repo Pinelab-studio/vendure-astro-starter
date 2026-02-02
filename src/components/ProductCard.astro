@@ -1,0 +1,47 @@
+---
+import { ArrowUpRight } from './icons/ArrowUpRight';
+
+interface Props {
+  href: string;
+  image: string;
+  title: string;
+  price: string;
+}
+
+const { href, image, title, price } = Astro.props;
+---
+
+<a
+  href={href}
+  class="group block w-56 overflow-hidden rounded-box bg-base-200 xl:w-auto"
+>
+  <figure class="relative aspect-[4/5] overflow-hidden">
+    <img
+      src={image}
+      alt={title}
+      class="h-full w-full object-cover"
+    />
+    <div
+      class="absolute inset-0 bg-base-100 opacity-0 transition-opacity duration-300 group-hover:opacity-20"
+      aria-hidden="true"
+    />
+  </figure>
+  <div
+    class="flex items-end justify-between gap-4 bg-base-200 px-0 py-4"
+  >
+    <div class="min-w-0 flex-1">
+      <h3 class="truncate font-bold tracking-wide uppercase text-base-content">
+        {title}
+      </h3>
+      {price && (
+        <p class="text-sm text-base-content opacity-70">{price}</p>
+      )}
+    </div>
+    <span
+      class="btn btn-circle btn-primary btn-sm shrink-0 text-base-content"
+      aria-hidden="true"
+    >
+      <ArrowUpRight className="size-4" />
+    </span>
+  </div>
+</a>
