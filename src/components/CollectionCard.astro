@@ -1,4 +1,6 @@
 ---
+import { ArrowUpRight } from './icons/ArrowUpRight';
+
 interface Props {
   href: string;
   image: string;
@@ -11,10 +13,18 @@ const { href, image, title, description } = Astro.props;
 
 <a href={href} class="card card-compact group">
   <figure>
-    <img src={image} alt={title} class="aspect-3/2 w-full object-cover group-hover:opacity-75 lg:aspect-5/6" />
+    <img src={image} alt={title} class="aspect-[4/3] w-full object-cover group-hover:opacity-75 lg:aspect-[6/5]" />
   </figure>
-  <div class="card-body">
-    <h3 class="card-title">{title}</h3>
-    <p class="opacity-70">{description}</p>
+  <div class="card-body flex-row items-end justify-between gap-4 px-0">
+    <div class="min-w-0 flex-1">
+      <h3 class="card-title uppercase">{title}</h3>
+      <p class="opacity-70" set:html={description}></p>
+    </div>
+    <span
+      class="btn btn-circle btn-primary btn-sm shrink-0 text-base-content"
+      aria-hidden="true"
+    >
+      <ArrowUpRight className="size-4" />
+    </span>
   </div>
 </a>
