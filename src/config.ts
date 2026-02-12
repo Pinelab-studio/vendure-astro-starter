@@ -1,0 +1,1 @@
+export const vendureApi = "https://vendure.noharmdone.nl/shop-api";

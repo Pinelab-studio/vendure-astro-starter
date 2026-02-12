@@ -1,0 +1,86 @@
+---
+interface Collection {
+  id: string;
+  name: string;
+  slug: string;
+  featuredAsset?: { preview: string } | null;
+  children?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    featuredAsset?: { preview: string } | null;
+  }> | null;
+}
+
+interface Props {
+  collections: Collection[];
+  base: string;
+}
+const { collections, base } = Astro.props;
+---
+
+<!-- Mobile sidebar overlay -->
+<label for="mobile-menu" id="mobile-overlay" class="fixed inset-0 bg-neutral/50 z-40 hidden cursor-pointer" aria-label="close sidebar"></label>
+
+<!-- Mobile sidebar -->
+<aside id="mobile-sidebar" class="fixed top-0 left-0 h-full w-80 bg-neutral text-neutral-content z-50 transition-transform overflow-y-auto p-4">
+  <div class="flex justify-end mb-4">
+    <label for="mobile-menu" class="btn btn-ghost btn-circle text-neutral-content">
+      <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18 18 6M6 6l12 12" /></svg>
+    </label>
+  </div>
+
+  <div role="tablist" class="tabs tabs-border">
+    {collections.map((collection, i) => {
+      const link = `${base}/collection/${collection.slug}`;
+      const children = collection.children ?? [];
+      return (
+        <>
+          <input type="radio" name="mobile-tabs" role="tab" class="tab" aria-label={collection.name} checked={i === 0} />
+          <div role="tabpanel" class="tab-content py-6">
+            <a href={link} class="card card-compact mb-4">
+              <figure><img src={collection.featuredAsset?.preview ?? ""} alt={collection.name} class="rounded-box aspect-square object-cover" /></figure>
+              <div class="card-body p-2"><span class="font-medium">{collection.name}</span><span class="opacity-70">View all</span></div>
+            </a>
+            {children.length > 0 && (
+              <div class="grid grid-cols-2 gap-4">
+                {children.map((child) => (
+                  <a href={`${base}/collection/${child.slug}`} class="card card-compact">
+                    <figure><img src={child.featuredAsset?.preview ?? ""} alt={child.name} class="rounded-box aspect-square object-cover" /></figure>
+                    <div class="card-body p-2">{child.name}</div>
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </>
+      );
+    })}
+  </div>
+
+  <div class="divider"></div>
+
+  <ul class="menu">
+    <li><a href="#">Company</a></li>
+    <li><a href="#">Stores</a></li>
+  </ul>
+
+  <div class="divider"></div>
+
+  <ul class="menu">
+    <li><a href="#">Create an account</a></li>
+    <li><a href="#">Sign in</a></li>
+  </ul>
+
+  <div class="divider"></div>
+
+  <div class="px-4">
+    <select class="select select-bordered w-full">
+      <option>CAD</option>
+      <option>USD</option>
+      <option>AUD</option>
+      <option>EUR</option>
+      <option>GBP</option>
+    </select>
+  </div>
+</aside>

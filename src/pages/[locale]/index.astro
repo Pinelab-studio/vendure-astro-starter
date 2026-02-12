@@ -1,26 +1,10 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Navigation from "../../components/Navigation.astro";
+import Navigation from "../../features/navigation/Navigation.astro";
 import Hero from "../../components/Hero.astro";
 import ProductCard from "../../components/ProductCard.astro";
 import CollectionCard from "../../components/CollectionCard.astro";
 import Footer from "../../components/Footer.astro";
-import request from "graphql-request";
-
-import { graphql } from "gql.tada";
-
-const ProductsList = graphql(`
-  query {
-    products(options: { skip: 0, take: 10 }) {
-      items {
-        id
-        name
-      }
-    }
-  }
-`);
-
-const data = await request("https://api.pinelab.studio/shop-api", ProductsList);
 ---
 
 <BaseLayout title="Astro", metaTitle="Astro", metaDescription="Astro">
