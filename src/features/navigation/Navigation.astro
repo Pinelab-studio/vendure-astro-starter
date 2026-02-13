@@ -52,7 +52,7 @@ const base = locale ? `/${locale}` : "";
 
       <!-- Desktop menu: one item per top-level collection, subcollections in dropdown -->
       <div class="navbar-center hidden lg:flex">
-        <ul class="menu menu-horizontal px-1">
+        <ul class="menu menu-horizontal uppercase px-1">
           {collections.map((collection) => {
             const hasChildren = collection.children?.length;
             const link = `${base}/collection/${collection.slug}`;
@@ -64,7 +64,7 @@ const base = locale ? `/${locale}` : "";
                     <ul class="bg-neutral rounded-box z-50 w-96 p-5 shadow text-neutral-content">
                       <li class="grid grid-cols-2 gap-5">
                         {collection.children!.map((child) => (
-                          <a href={`${base}/collection/${child.slug}`} class="card card-compact bg-neutral text-neutral-content">
+                          <a href={`${base}/collection/${child.slug}`} class="card card-compact ">
                             <figure class="aspect-square"><img src={child.featuredAsset?.preview ?? ""} alt={child.name} class="rounded-box w-full h-full object-cover" /></figure>
                             <div class="card-body p-3">{child.name}</div>
                           </a>
@@ -78,11 +78,6 @@ const base = locale ? `/${locale}` : "";
               </li>
             );
           })}
-          <li>
-            <a href="#" class="text-neutral-content">
-              <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-            </a>
-          </li>
         </ul>
       </div>
 
@@ -91,9 +86,6 @@ const base = locale ? `/${locale}` : "";
         <label for="mobile-menu" class="link link-hover text-neutral-content cursor-pointer">
           <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" /></svg>
         </label>
-        <a href="#" class="link link-hover text-neutral-content">
-          <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
-        </a>
       </div>
 
       <!-- Logo (mobile) -->
@@ -105,6 +97,10 @@ const base = locale ? `/${locale}` : "";
 
       <!-- Right side -->
       <div class="navbar-end gap-4">
+        <a href="#" class="text-neutral-content px-4">
+          <!-- Search icon -->
+          <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" /></svg>
+        </a>
         <a href="#" class="link link-hover text-neutral-content relative inline-flex">
           <svg class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" /></svg>
           <span class="absolute -top-1.5 -right-3 badge badge-sm min-w-5 h-5 flex items-center justify-center p-0 rounded-full">0</span>
