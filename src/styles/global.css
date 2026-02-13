@@ -53,9 +53,9 @@ body {
   --color-warning-content: oklch(92% 0.12 95.746);
   --color-error: oklch(44% 0.177 26.899);
   --color-error-content: oklch(88% 0.062 18.334);
-  --radius-selector: 0rem;
-  --radius-field: 0.1rem;
-  --radius-box: 0.1rem;
+  --radius-selector: 0.50rem;
+  --radius-field: 2rem;
+  --radius-box: 1rem;
   --size-selector: 0.25rem;
   --size-field: 0.3rem;
   --border: 0px;

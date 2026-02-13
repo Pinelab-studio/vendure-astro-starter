@@ -1,10 +1,13 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
-import Navigation from "../../features/navigation/Navigation.astro";
-import Hero from "../../components/Hero.astro";
-import ProductCard from "../../components/ProductCard.astro";
-import CollectionCard from "../../components/CollectionCard.astro";
-import Footer from "../../components/Footer.astro";
+import Navigation from "../../features/Navigation.astro";
+import Hero from "../../features/Hero.astro";
+import ProductCard from "../../features/product/ProductCard.astro";
+import CollectionCard from "../../features/collection/CollectionCard.astro";
+import Footer from "../../features/Footer.astro";
+import { getNavigationCollections } from "../../features/collection/collection-service";
+
+const collections = await getNavigationCollections(Astro.locals.locale);
 ---
 
 <BaseLayout title="Astro", metaTitle="Astro", metaDescription="Astro">
@@ -34,24 +37,28 @@ import Footer from "../../components/Footer.astro";
           image="https://images.unsplash.com/photo-1622260614153-03223fb72052?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           title="New Arrivals"
           price="€ 100"
+          hasMultipleVariants={false}
         />
         <ProductCard
           href="#"
           image="https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           title="Productivity"
           price="€ 100"
+          hasMultipleVariants={true}
         />
         <ProductCard
           href="#"
           image="https://images.unsplash.com/photo-1622260614153-03223fb72052?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           title="Workspace"
           price="€ 100"
+          hasMultipleVariants={false}
         />
         <ProductCard
           href="#"
           image="https://images.unsplash.com/photo-1547949003-9792a18a2601?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
           title="Accessories"
           price="€ 100"
+          hasMultipleVariants={true}
         />
       </div>
     </section>
@@ -70,24 +77,14 @@ import Footer from "../../components/Footer.astro";
       </p>
 
       <div class="mt-10 grid gap-4 lg:grid-cols-3 lg:gap-8">
-        <CollectionCard
-          href="#"
-          image="https://images.unsplash.com/photo-1502666308545-76d8a0c5602f?q=80&w=1738&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          title="Subway kits"
-          description="Everything you need <br/> to beautify a subway train."
-        />
-        <CollectionCard
-          href="#"
-          image="https://images.unsplash.com/photo-1523395555535-a43123287dbc?q=80&w=774&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          title="Tunnel syndrome"
-          description="Explore the tunnels with our <br/> tunnel exploring stuff."
-        />
-        <CollectionCard
-          href="#"
-          image="https://images.unsplash.com/photo-1622057656693-48797b659baa?q=80&w=842&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-          title="Worker Bees"
-          description="Everything you need to <br/> pretend to be a worker."
-        />
+        {collections.map((collection) => (
+          <CollectionCard
+            href={`/c/${collection.slug}`}
+            image={`${collection.featuredAsset?.preview}?preset=small&format=webp`}
+            title={collection.name}
+            description={collection.description}
+          />
+        ))}
       </div>
     </section>
   </main>

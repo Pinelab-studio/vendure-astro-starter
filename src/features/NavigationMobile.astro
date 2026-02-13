@@ -1,0 +1,84 @@
+---
+import { ChevronDown } from "../features/icons/ChevronDown";
+interface Collection {
+  id: string;
+  name: string;
+  description: string;
+  slug: string;
+  featuredAsset?: { preview: string } | null;
+  children?: Array<{
+    id: string;
+    name: string;
+    slug: string;
+    featuredAsset?: { preview: string } | null;
+  }> | null;
+}
+
+interface Props {
+  collections: Collection[];
+  base: string;
+}
+const { collections, base } = Astro.props;
+---
+
+<!-- Mobile sidebar overlay -->
+<label
+  for="mobile-menu"
+  id="mobile-overlay"
+  class="bg-neutral/50 fixed inset-0 z-40 hidden cursor-pointer"
+  aria-label="close sidebar"></label>
+
+<!-- Mobile sidebar -->
+<aside
+  id="mobile-sidebar"
+  class="bg-neutral text-neutral-content fixed top-0 left-0 z-50 h-full w-80 overflow-y-auto p-4 transition-transform"
+>
+  <div class="mb-4 flex justify-end">
+    <label
+      for="mobile-menu"
+      class="btn btn-ghost btn-circle text-neutral-content"
+    >
+      <ChevronDown className="size-6" />
+    </label>
+  </div>
+
+  <div class="space-y-2 uppercase">
+    {
+      collections.map((collection) => {
+        const link = `${base}/c/${collection.slug}`;
+        const children = collection.children ?? [];
+        const hasChildren = children.length > 0;
+
+        if (hasChildren) {
+          const collapseId = `mobile-collapse-${collection.id}`;
+          return (
+            <div class="collapse collapse-arrow bg-neutral">
+              <input type="checkbox" id={collapseId} />
+              <label for={collapseId} class="collapse-title text-neutral-content min-h-0 p-0 py-2 cursor-pointer">
+                {collection.name}
+              </label>
+              <div class="collapse-content text-sm text-neutral-content px-0 pt-0">
+                <div class="pl-4 space-y-1">
+                  {children.map((child) => (
+                    <a
+                      href={`${base}/collection/${child.slug}`}
+                      class="link link-hover block py-2"
+                    >
+                      {child.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          );
+        }
+
+        return (
+          <a href={link} class="link link-hover text-neutral-content block py-2">
+            {collection.name}
+          </a>
+        );
+      })
+    }
+  </div>
+</aside>
