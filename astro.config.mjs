@@ -15,4 +15,8 @@ export default defineConfig({
   adapter: node({
     mode: "standalone",
   }),
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: "hover",
+  },
 });

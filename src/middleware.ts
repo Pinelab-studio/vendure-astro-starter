@@ -1,6 +1,6 @@
 import { defineMiddleware, sequence } from "astro:middleware";
 import { createMessageFn } from "./lib/locale-util";
-import { locales } from "./locales";
+import { translations } from "./translations";
 import { ENABLED_LOCALES, DEFAULT_LOCALE } from "./config";
 
 const i18nMiddleware = defineMiddleware(async (context, next) => {
@@ -12,7 +12,7 @@ const i18nMiddleware = defineMiddleware(async (context, next) => {
   }
 
   let locale = pathname.split("/")?.[1];
-  if (!ENABLED_LOCALES.includes(locale)) {
+  if (!locale || !ENABLED_LOCALES.includes(locale)) {
     // We assume that the first part of the path is the NOT a locale,
     // so we rewrite to the default locale and append current path
     locale = DEFAULT_LOCALE;
@@ -21,8 +21,9 @@ const i18nMiddleware = defineMiddleware(async (context, next) => {
     newUrl.pathname = `/${DEFAULT_LOCALE}${pathname}`;
     return context.redirect(newUrl.href);
   }
+  const translatedMessages = translations[locale as keyof typeof translations];
   context.locals.locale = locale;
-  context.locals.m = createMessageFn(locales[locale as keyof typeof locales]);
+  context.locals.m = createMessageFn(translatedMessages);
   return next();
 });
 
