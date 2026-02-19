@@ -1,0 +1,38 @@
+---
+import { ArrowUpRight } from './icons/ArrowUpRight';
+
+interface Props {
+  href: string;
+  image: string;
+  title: string;
+  description: string;
+}
+
+const { href, image, title, description } = Astro.props;
+---
+
+<a href={href} class="group block">
+  <figure class="relative">
+    <img
+      src={image}
+      alt={title}
+      class="aspect-square w-full object-cover rounded-box"
+    />
+    <div
+      class="absolute inset-0 bg-base-100 opacity-0 transition-opacity duration-300 group-hover:opacity-20 rounded-box"
+      aria-hidden="true"
+    />
+  </figure>
+  <div class="flex flex-row items-end justify-between gap-4 pt-4">
+    <div class="min-w-0 flex-1">
+      <h3 class="font-semibold text-lg uppercase">{title}</h3>
+      <div class="opacity-70 font-light" set:html={description}></div>
+    </div>
+    <span
+      class="btn btn-circle btn-primary btn-sm shrink-0 text-base-content"
+      aria-hidden="true"
+    >
+      <ArrowUpRight className="size-4" />
+    </span>
+  </div>
+</a>

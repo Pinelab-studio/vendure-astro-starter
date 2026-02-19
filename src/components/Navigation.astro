@@ -1,0 +1,103 @@
+---
+import { getNavigationCollections } from "../server/collection-service";
+import NavigationMobile from "./NavigationMobile.astro";
+import { Bars3 } from "./icons/Bars3";
+import { MagnifyingGlass } from "./icons/MagnifyingGlass";
+import { Cart } from "./Cart";
+
+const locale = Astro.locals.locale;
+const collections = await getNavigationCollections(locale);
+const base = `/${locale}`;
+---
+
+<!-- Mobile menu toggle -->
+<input id="mobile-menu" type="checkbox" class="peer hidden" />
+
+<!-- Navigation: single font size applied here -->
+<header class="sticky top-0 z-30 bg-neutral">
+  <nav aria-label="Top">
+    <div class="navbar mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <!-- Logo (desktop) -->
+      <div class="navbar-start hidden lg:flex">
+        <a href="#" class="link link-hover">
+          <img src="/nhd-logo.png" alt="Your Company" class="h-10 w-auto" />
+        </a>
+      </div>
+
+      <!-- Desktop menu: one item per top-level collection, subcollections in dropdown -->
+      <div class="navbar-center hidden lg:flex">
+        <ul class="menu menu-horizontal uppercase px-1">
+          {collections.map((collection) => {
+            const hasChildren = collection.children?.length;
+            const link = `${base}/collection/${collection.slug}`;
+            return (
+              <li>
+                {hasChildren ? (
+                  <details>
+                    <summary class="text-neutral-content">{collection.name}</summary>
+                    <ul class="bg-neutral rounded-box z-50 w-96 p-5 shadow text-neutral-content">
+                      <li class="grid grid-cols-2 gap-5">
+                        {collection.children!.map((child) => (
+                          <a href={`${base}/collection/${child.slug}`} class="card card-compact ">
+                            <figure class="aspect-square"><img src={child.featuredAsset?.preview ?? ""} alt={child.name} class="rounded-box w-full h-full object-cover" /></figure>
+                            <div class="card-body p-3">{child.name}</div>
+                          </a>
+                        ))}
+                      </li>
+                    </ul>
+                  </details>
+                ) : (
+                  <a href={link} class="text-neutral-content">{collection.name}</a>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+
+      <!-- Mobile menu button -->
+      <div class="navbar-start lg:hidden gap-2">
+        <label for="mobile-menu" class="link link-hover text-neutral-content cursor-pointer">
+          <Bars3 className="size-6" />
+        </label>
+      </div>
+
+      <!-- Logo (mobile) -->
+      <div class="navbar-center lg:hidden">
+        <a href="#">
+          <img src="/nhd-logo.png" alt="Your Company" class="h-8 w-auto" />
+        </a>
+      </div>
+
+      <!-- Right side -->
+      <div class="navbar-end gap-4">
+        <a href="#" class="text-neutral-content px-4">
+          <MagnifyingGlass className="size-5" />
+        </a>
+        <Cart client:load />
+      </div>
+    </div>
+  </nav>
+</header>
+
+<NavigationMobile collections={collections} base={base} />
+
+<script>
+  const navDetails = () => document.querySelectorAll('header nav details')
+  // Only one dropdown open at a time
+  navDetails().forEach((details) => {
+    details.addEventListener('toggle', () => {
+      if ((details as HTMLDetailsElement).open) {
+        navDetails().forEach((other) => {
+          if (other !== details) other.removeAttribute('open')
+        })
+      }
+    })
+  })
+  // Click outside closes all
+  document.addEventListener('click', (e) => {
+    if (!(e.target as HTMLDetailsElement).closest('header nav details')) {
+      navDetails().forEach((d) => d.removeAttribute('open'))
+    }
+  })
+</script>

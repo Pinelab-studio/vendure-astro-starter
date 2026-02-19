@@ -1,3 +1,15 @@
+
+interface ImportMetaEnv {
+  /**
+   * Random secret to prevent unauthorized cache invalidation calls
+   */
+  CACHE_INVALIDATION_SECRET: string;
+}
+
+interface ImportMeta {
+  readonly env: ImportMetaEnv;
+}
+
 type Messages = typeof import("./translations").Messages;
 
 declare namespace App {

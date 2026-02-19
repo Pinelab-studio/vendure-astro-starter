@@ -1,7 +1,7 @@
 ---
 import "../styles/global.css";
 import { Notification } from "../components/Notification";
-import { createMessageFn } from "../lib/locale-util";
+import { CartModal } from "../components/CartModal";
 import { translations } from "../translations";
 
 interface Props {
@@ -26,7 +26,8 @@ const { title, metaTitle, metaDescription } = Astro.props;
   <body class="bg-base-200">
 
     <slot />
-    <Notification client:idle />
+    <Notification client:only="react" />
+    <CartModal client:only="react" />
   </body>
 </html>
 
