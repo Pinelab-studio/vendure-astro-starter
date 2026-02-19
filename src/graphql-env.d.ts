@@ -293,6 +293,11 @@ import * as gqlTada from 'gql.tada';
 
 declare module 'gql.tada' {
   interface setupSchema {
-    introspection: introspection
+    introspection: introspection;
+    scalars: {
+      Money: number;
+      DateTime: string;
+      JSON: any;
+    };
   }
 }

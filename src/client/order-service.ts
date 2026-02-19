@@ -1,7 +1,7 @@
 import { graphql, readFragment, type ResultOf } from "gql.tada";
 import { $activeOrder, $cartOpen, $notification } from "./store";
-import { ActiveOrderFragment, ActiveOrderQuery, AddItemToOrderMutation } from "./order-queries";
-import { getErrorMessage, isErrorResult } from "../lib/error-util";
+import { ActiveOrderFragment, ActiveOrderQuery, AddItemToOrderMutation, AdjustOrderLineMutation, ApplyCouponCodeMutation, RemoveCouponCodeMutation } from "./order-queries";
+import { getErrorMessage, isErrorResult, type ErrorResult } from "../lib/error-util";
 import { createMessageFn } from "../lib/locale-util";
 import { vendureClient } from "./vendure-client";
 import { m } from "./store";
@@ -35,11 +35,53 @@ export async function addItemToOrder(locale: string, productVariantId: string, q
     return;
   }
   $activeOrder.set(addItemToOrder as unknown as ActiveOrder);
-  // Notify, with translated message
-  const variant = $activeOrder.get()?.lines[0].productVariant.name!
+  const variant = $activeOrder.get()?.lines[0].productVariant.name!;
   $notification.set({
     message: m.itemAddedToCart({ variant }),
     type: "success",
     cta: { text: m.viewCart({}), callback: () => { $cartOpen.set(true); } },
   });
+}
+
+export async function adjustOrderLine(locale: string, orderLineId: string, quantity: number): Promise<void> {
+  const { adjustOrderLine } = await vendureClient(locale).request(
+    AdjustOrderLineMutation,
+    { orderLineId, quantity }
+  );
+  const error = isErrorResult(adjustOrderLine);
+  if (error) {
+    $notification.set({ message: error.message, type: 'error' });
+    return;
+  }
+  $activeOrder.set(adjustOrderLine as unknown as ActiveOrder);
+}
+
+export async function removeOrderLine(locale: string, orderLineId: string): Promise<void> {
+  return await adjustOrderLine(locale, orderLineId, 0);
+}
+
+export async function applyCouponCode(locale: string, couponCode: string): Promise<ErrorResult | undefined> {
+  const { applyCouponCode } = await vendureClient(locale).request(
+    ApplyCouponCodeMutation,
+    { couponCode }
+  ).catch(error => {
+    $notification.set({ message: getErrorMessage(error), type: 'error' });
+    throw error;
+  });
+  const error = isErrorResult(applyCouponCode);
+  if (error) {
+    return error;
+  }
+  $activeOrder.set(applyCouponCode as unknown as ActiveOrder);
+}
+
+export async function removeCouponCode(locale: string, couponCode: string): Promise<void> {
+  const { removeCouponCode } = await vendureClient(locale).request(
+    RemoveCouponCodeMutation,
+    { couponCode }
+  ).catch(error => {
+    $notification.set({ message: getErrorMessage(error), type: 'error' });
+    throw error;
+  });
+  $activeOrder.set(removeCouponCode as unknown as ActiveOrder);
 }

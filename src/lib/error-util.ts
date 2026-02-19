@@ -8,11 +8,11 @@ export interface ErrorResult {
 /**
  * Returns the result as an ErrorResult if it is an error result, otherwise null.
  */
-export function isErrorResult(result: unknown): ErrorResult | null {
-  if (!(result && typeof result === 'object' && 'errorCode' in result && 'message' in result)) {
+export function isErrorResult(result: any): ErrorResult | null {
+  if (!('errorCode' in result)) {
     return null;
   }
-  return result as unknown as ErrorResult;
+  return result as ErrorResult;
 }
 
 /**

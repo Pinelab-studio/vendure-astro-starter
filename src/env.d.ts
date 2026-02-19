@@ -24,5 +24,6 @@ declare namespace App {
 
 interface Window {
   __messages: Messages;
+  __locale: string;
 }
 

@@ -26,19 +26,19 @@ const { title, metaTitle, metaDescription } = Astro.props;
   <body class="bg-base-200">
 
     <slot />
-    <Notification client:only="react" />
     <CartModal client:only="react" />
+    <Notification client:only="react" />
   </body>
 </html>
 
-<script>
-  import { getActiveOrder } from "../client/order-service";
-  const locale = document.documentElement.dataset.locale ?? "nl";
-  // Fetch active order client-side on every page load
-  getActiveOrder(locale).catch(console.error);
+<!-- Pass messages for current locale to the client -->
+<script define:vars={{ messages: translations[Astro.locals.locale as keyof typeof translations], locale: Astro.locals.locale }}>
+  window.__messages = messages;
+  window.__locale = locale;
 </script>
 
-<!-- Pass messages for current locale to the client -->
-<script define:vars={{ messages: translations[Astro.locals.locale as keyof typeof translations] }}>
-  window.__messages = messages;
+<script>
+  import { getActiveOrder } from "../client/order-service";
+  // Fetch active order client-side on every page load
+  getActiveOrder(window.__locale).catch(console.error);
 </script>

@@ -26,6 +26,7 @@ export const ActiveOrderFragment = graphql(`
           preview
         }
       }
+      couponCodes
       shippingLines {
         id
         priceWithTax
@@ -77,3 +78,35 @@ export const AddItemToOrderMutation = graphql(`
     `,
     [ActiveOrderFragment]
 );
+
+export const AdjustOrderLineMutation = graphql(`
+  mutation AdjustOrderLine($orderLineId: ID!, $quantity: Int!) {
+    adjustOrderLine(orderLineId: $orderLineId, quantity: $quantity) {
+      ...ActiveOrder
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`, [ActiveOrderFragment]);
+
+export const ApplyCouponCodeMutation = graphql(`
+  mutation ApplyCouponCode($couponCode: String!) {
+    applyCouponCode(couponCode: $couponCode) {
+      ...ActiveOrder
+      ... on ErrorResult {
+        errorCode
+        message
+      }
+    }
+  }
+`, [ActiveOrderFragment]);
+
+export const RemoveCouponCodeMutation = graphql(`
+  mutation RemoveCouponCode($couponCode: String!) {
+    removeCouponCode(couponCode: $couponCode) {
+      ...ActiveOrder
+    }
+  }
+`, [ActiveOrderFragment]);
