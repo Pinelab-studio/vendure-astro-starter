@@ -13,19 +13,14 @@ interface Props {
   variants: ProductDetail["variants"];
 }
 
-function getLocale() {
-  return document.documentElement.dataset.locale ?? "en";
-}
-
 export function ProductCard({ slug, image, title, price, variants }: Props) {
   const [loading, setLoading] = useState(false);
 
   async function handleAddToCart(e: React.MouseEvent) {
-    console.log("handleAddToCart", getLocale());
     e.preventDefault();
     setLoading(true);
     try {
-      await addItemToOrder(getLocale(), variants[0].id, 1);
+      await addItemToOrder(window.__locale, variants[0].id, 1);
     } finally {
       setLoading(false);
     }

@@ -11,8 +11,9 @@
     "plugins": [
       {
         "name": "gql.tada/ts-plugin",
-        "schema": "https://api.pinelab.studio/shop-api",
-        "tadaOutputLocation": "./src/graphql-env.d.ts"
+        "schema": "https://vendure.noharmdone.nl/shop-api",
+        "tadaOutputLocation": "./src/graphql/graphql-env.d.ts"
+
       }
     ],
     "jsx": "react-jsx",

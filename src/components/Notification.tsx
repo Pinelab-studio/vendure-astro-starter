@@ -50,14 +50,6 @@ export function Notification() {
                 {notification.cta.text}
               </button>
             )}
-            <button
-              type="button"
-              className="btn btn-ghost btn-sm btn-circle hover:bg-transparent"
-              onClick={() => $notification.set(null)}
-              aria-label="Sluiten"
-            >
-              ✕
-            </button>
           </div>
         </div>
       </div>

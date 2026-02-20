@@ -14,6 +14,8 @@ const nl = {
     couponCode: "Kortingscode",
     apply: "Toepassen",
     invalidCouponCode: "Ongeldige kortingscode",
+    more: "Meer",
+    cartEmpty: "Je winkelwagen is leeg",
 }
 
 const en: typeof nl = {
@@ -32,6 +34,8 @@ const en: typeof nl = {
     couponCode: "Coupon code",
     apply: "Apply",
     invalidCouponCode: "Invalid coupon code",
+    more: "More",
+    cartEmpty: "Your cart is empty",
 }
 
 export const translations = {nl, en};

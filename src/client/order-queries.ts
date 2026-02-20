@@ -1,4 +1,4 @@
-import { graphql, type ResultOf } from "gql.tada";
+import { graphql } from "../graphql/graphql";
 
 export const ActiveOrderFragment = graphql(`
     fragment ActiveOrder on Order {
@@ -25,6 +25,11 @@ export const ActiveOrderFragment = graphql(`
           id
           preview
         }
+      }
+      discounts {
+        type
+        description
+        amountWithTax
       }
       couponCodes
       shippingLines {
