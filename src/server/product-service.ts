@@ -1,6 +1,7 @@
 import request from "graphql-request";
-import { graphql, readFragment, type ResultOf } from "gql.tada";
+import { readFragment, type ResultOf } from "gql.tada";
 import { vendureApi } from "../config";
+import { graphql } from "../graphql/graphql";
 
 const ProductDetailFragment = graphql(`
   fragment ProductDetail on Product {

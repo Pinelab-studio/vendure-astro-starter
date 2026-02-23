@@ -1,6 +1,20 @@
 import { type ResultOf } from "gql.tada";
 import { getErrorMessage, isErrorResult, type ErrorResult } from "../lib/error-util";
-import { ActiveOrderFragment, ActiveOrderQuery, AddItemToOrderMutation, AdjustOrderLineMutation, ApplyCouponCodeMutation, RemoveCouponCodeMutation } from "./order-queries";
+import {
+  ActiveOrderFragment,
+  ActiveOrderQuery,
+  AddItemToOrderMutation,
+  AdjustOrderLineMutation,
+  ApplyCouponCodeMutation,
+  RemoveCouponCodeMutation,
+  SetCustomerForOrderMutation,
+  SetOrderShippingAddressMutation,
+  EligibleShippingMethodsQuery,
+  SetOrderShippingMethodMutation,
+  TransitionOrderToStateMutation,
+  AddPaymentToOrderMutation,
+  EligiblePaymentMethodsQuery,
+} from "./order-queries";
 import { $activeOrder, $cartOpen, $notification, m } from "./store";
 import { vendureClient } from "./vendure-client";
 
@@ -30,7 +44,7 @@ export async function addItemToOrder(locale: string, productVariantId: string, q
   const error = isErrorResult(addItemToOrder);
   if (error) {
     $notification.set({ message: error.message, type: 'error' });
-    return;
+    throw error;
   }
   $activeOrder.set(addItemToOrder as unknown as ActiveOrder);
   const variant = $activeOrder.get()?.lines[0].productVariant.name!;
@@ -82,4 +96,102 @@ export async function removeCouponCode(locale: string, couponCode: string): Prom
     throw error;
   });
   $activeOrder.set(removeCouponCode as unknown as ActiveOrder);
+}
+
+// Checkout-related types
+
+export type ShippingMethodQuote = ResultOf<typeof EligibleShippingMethodsQuery>["eligibleShippingMethods"][number];
+export type EligiblePaymentMethod = ResultOf<typeof EligiblePaymentMethodsQuery>["eligiblePaymentMethods"][number];
+
+// Checkout-related functions
+
+export async function setCustomerForOrder(locale: string, input: {
+  firstName: string;
+  lastName: string;
+  emailAddress: string;
+  phoneNumber?: string;
+}): Promise<void> {
+  const { setCustomerForOrder } = await vendureClient(locale).request(
+    SetCustomerForOrderMutation,
+    { input }
+  );
+  const error = isErrorResult(setCustomerForOrder);
+  if (error) {
+    $notification.set({ message: error.message, type: 'error' });
+    throw error;
+  }
+  $activeOrder.set(setCustomerForOrder as unknown as ActiveOrder);
+}
+
+export async function setOrderShippingAddress(locale: string, input: {
+  fullName?: string;
+  company?: string;
+  streetLine1: string;
+  streetLine2?: string;
+  city?: string;
+  province?: string;
+  postalCode?: string;
+  countryCode: string;
+  phoneNumber?: string;
+}): Promise<void> {
+  const { setOrderShippingAddress } = await vendureClient(locale).request(
+    SetOrderShippingAddressMutation,
+    { input }
+  );
+  const error = isErrorResult(setOrderShippingAddress);
+  if (error) {
+    $notification.set({ message: error.message, type: 'error' });
+    throw error;
+  }
+  $activeOrder.set(setOrderShippingAddress as unknown as ActiveOrder);
+}
+
+export async function getEligibleShippingMethods(locale: string): Promise<ShippingMethodQuote[]> {
+  const { eligibleShippingMethods } = await vendureClient(locale).request(
+    EligibleShippingMethodsQuery
+  );
+  return eligibleShippingMethods;
+}
+
+export async function setOrderShippingMethod(locale: string, shippingMethodId: string): Promise<void> {
+  const { setOrderShippingMethod } = await vendureClient(locale).request(
+    SetOrderShippingMethodMutation,
+    { id: [shippingMethodId] }
+  );
+  const error = isErrorResult(setOrderShippingMethod);
+  if (error) {
+    $notification.set({ message: error.message, type: 'error' });
+    throw error;
+  }
+  $activeOrder.set(setOrderShippingMethod as unknown as ActiveOrder);
+}
+
+export async function transitionOrderToState(locale: string, state: string): Promise<void> {
+  const { transitionOrderToState } = await vendureClient(locale).request(
+    TransitionOrderToStateMutation,
+    { state }
+  );
+  const error = isErrorResult(transitionOrderToState);
+  if (error) {
+    $notification.set({ message: error.message, type: 'error' });
+    throw error;
+  }
+  $activeOrder.set(transitionOrderToState as unknown as ActiveOrder);
+}
+
+export async function addPaymentToOrder(locale: string, method: string, metadata: Record<string, any> = {}): Promise<string | undefined> {
+  const { addPaymentToOrder } = await vendureClient(locale).request(
+    AddPaymentToOrderMutation,
+    { input: { method, metadata } }
+  );
+  const error = isErrorResult(addPaymentToOrder);
+  if (error) return error.message;
+  $activeOrder.set(addPaymentToOrder as unknown as ActiveOrder);
+}
+
+export async function getEligiblePaymentMethods(locale: string): Promise<EligiblePaymentMethod[]> {
+  const { eligiblePaymentMethods } = await vendureClient(locale).request(
+    EligiblePaymentMethodsQuery
+  );
+  return eligiblePaymentMethods;
 }

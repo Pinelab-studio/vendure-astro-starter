@@ -23,6 +23,7 @@ const i18nMiddleware = defineMiddleware(async (context, next) => {
   }
   const translatedMessages = translations[locale as keyof typeof translations];
   context.locals.locale = locale;
+  context.locals.messages = translatedMessages;
   context.locals.m = createMessageFn(translatedMessages);
   return next();
 });

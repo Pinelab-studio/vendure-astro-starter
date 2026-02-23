@@ -12,6 +12,13 @@ export function isErrorResult(result: any): ErrorResult | null {
   if (!('errorCode' in result)) {
     return null;
   }
+  if ('transitionError' in result) {
+    return {
+      errorCode: result.errorCode,
+      // If available, use the transitionError because it is more specific
+      message: result.transitionError,
+    };
+  }
   return result as ErrorResult;
 }
 
@@ -19,8 +26,11 @@ export function isErrorResult(result: any): ErrorResult | null {
  * Tries to parse the error message from a graphql error, or otherwise just error.message.
  */
 export function getErrorMessage(error: any): string {
-    if (error?.response?.errors?.[0]?.message) {
-        return error.response.errors[0].message;
-    }
-    return error?.message ?? 'Unknown error';
+  if (error?.response?.errors?.[0]?.transitionError) {
+    return error.response.errors[0].transitionError;
+  }
+  if (error?.response?.errors?.[0]?.message) {
+    return error.response.errors[0].message;
+  }
+  return error?.message ?? 'Unknown error';
 }

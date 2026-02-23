@@ -24,6 +24,8 @@ export const $notification = atom<Notification | null>(null);
 export const $cartOpen = atom<boolean>(false);
 
 
+
+
 /**
  * Message function to get translated messages for the current locale.
  * Should only be used on the client side! For server-side, use Astro.locals.m

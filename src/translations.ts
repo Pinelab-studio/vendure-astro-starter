@@ -16,6 +16,21 @@ const nl = {
     invalidCouponCode: "Ongeldige kortingscode",
     more: "Meer",
     cartEmpty: "Je winkelwagen is leeg",
+    contactInformation: "Contactgegevens",
+    emailAddress: "E-mailadres",
+    shippingInformation: "Verzendgegevens",
+    firstName: "Voornaam",
+    lastName: "Achternaam",
+    company: "Bedrijf",
+    address: "Adres",
+    houseNumber: "Huisnummer en toevoeging",
+    city: "Plaats",
+    country: "Land",
+    postalCode: "Postcode",
+    deliveryMethod: "Verzendmethode",
+    confirmOrder: "Bestelling bevestigen",
+    processing: "Bezig met verwerken...",
+    selectCountry: "Selecteer een land",
 }
 
 const en: typeof nl = {
@@ -36,6 +51,21 @@ const en: typeof nl = {
     invalidCouponCode: "Invalid coupon code",
     more: "More",
     cartEmpty: "Your cart is empty",
+    contactInformation: "Contact information",
+    emailAddress: "Email address",
+    shippingInformation: "Shipping information",
+    firstName: "First name",
+    lastName: "Last name",
+    company: "Company",
+    address: "Address",
+    houseNumber: "House number",
+    city: "City",
+    country: "Country",
+    postalCode: "Postal code",
+    deliveryMethod: "Delivery method",
+    confirmOrder: "Confirm order",
+    processing: "Processing...",
+    selectCountry: "Select a country",
 }
 
 export const translations = {nl, en};

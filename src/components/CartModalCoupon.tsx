@@ -43,7 +43,7 @@ export function CartModalCoupon({ couponCodes }: { couponCodes: string[] }) {
               <span key={c} className="badge badge-primary gap-1 rounded-full">
                 {c}
                 <button
-                  className="btn btn-ghost btn-xs btn-circle"
+                  className="cursor-pointer hover:cursor-pointer"
                   onClick={() => removeCouponCode(locale, c)}
                 >
                   ✕
