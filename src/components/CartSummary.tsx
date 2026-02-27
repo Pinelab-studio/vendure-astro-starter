@@ -16,7 +16,7 @@ export function CartSummary({ order }: { order: ActiveOrder }) {
           <span>{formatMoney(discount.amountWithTax)}</span>
         </div>
       ))}
-      {order.shippingWithTax > 0 && (
+      {order.shippingWithTax != undefined && (
         <div className="flex justify-between">
           <span>{m.shipping()}</span>
           <span>{formatMoney(order.shippingWithTax)}</span>
