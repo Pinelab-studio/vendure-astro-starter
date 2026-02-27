@@ -1,0 +1,32 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Navigation from "../../components/Navigation.astro";
+import Footer from "../../components/Footer.astro";
+import { CheckoutForm } from "../../components/CheckoutForm";
+import { getAvailableCountries } from "../../server/global-settings-service";
+
+const { locale } = Astro.params;
+const availableCountries = await getAvailableCountries(locale!);
+---
+
+<BaseLayout title="Checkout" metaTitle="Checkout" metaDescription="Checkout">
+  <Navigation />
+
+  <main class="bg-base-100">
+    <div
+      class="mx-auto max-w-2xl px-4 pt-16 pb-24 sm:px-6 lg:max-w-7xl lg:px-8"
+    >
+      <h2 class="sr-only">Checkout</h2>
+      <CheckoutForm client:only="react" availableCountries={availableCountries}>
+        <div
+          slot="fallback"
+          class="flex min-h-[100px] items-center justify-center"
+        >
+          <span class="loading loading-spinner loading-xl"></span>
+        </div>
+      </CheckoutForm>
+    </div>
+  </main>
+
+  <Footer />
+</BaseLayout>
