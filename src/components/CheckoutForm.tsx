@@ -1,5 +1,6 @@
 import { useStore } from "@nanostores/react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { debounce } from "../lib/debounce";
 import {
   type ShippingMethodQuote,
   addPaymentToOrder,
@@ -19,7 +20,6 @@ export function CheckoutForm({
 }: {
   availableCountries: AvailableCountry[];
 }) {
-  const order = useStore($activeOrder);
   const [eligibleShippingMethods, setEligibleShippingMethods] = useState<
     ShippingMethodQuote[]
   >([]);
@@ -27,50 +27,46 @@ export function CheckoutForm({
     useState<string>("");
   const [loading, setLoading] = useState(false);
 
-  // Set selected shipping method based on order
+  // Set selected shipping method in form based on order and eligible shipping methods
   useEffect(() => {
-    const locale = window.__locale;
-    getEligibleShippingMethods(locale).then(async (methods) => {
-      setEligibleShippingMethods(methods);
-      let currentMethodId =
-        order?.shippingLines?.[0]?.shippingMethod?.id ?? methods[0].id;
-      setSelectedShippingMethod(currentMethodId);
-    });
-  }, [order]);
+    refreshAndSelectDefaultShippingMethod();
+  }, []);
 
-  if (!order || order.totalQuantity === 0) {
+  if (!$activeOrder.get()?.totalQuantity) {
     return (
       <div className="py-12 text-center">
         <p className="text-base-content/70 mb-12">{m.cartEmpty({})}</p>
-        <a href="/" className="btn btn-primary"> Home</a>
+        <a href="/" className="btn btn-primary">
+          {" "}
+          Home
+        </a>
       </div>
     );
   }
 
-  const addr = order.shippingAddress;
+  const addr = $activeOrder.get()?.shippingAddress;
 
   /**
-   * Set customer on order (email only)
+   * Set customer on order (email only). Accepts form so it's safe to call from debounced handler (event is recycled).
    */
-  async function handleCustomerFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleCustomerFormSubmit(form: HTMLFormElement) {
     setLoading(true);
     try {
       const locale = window.__locale;
-      const form = new FormData(e.currentTarget);
-      const email = (form.get("email") as string) ?? "";
-      if (!email) {
-        return;
-      }
+      const formData = new FormData(form);
+      const email = (formData.get("email") as string) ?? "";
+      if (!email) return;
+      const currentOrder = $activeOrder.get();
       await setCustomerForOrder(locale, {
-        firstName: order?.customer?.firstName ?? "",
-        lastName: order?.customer?.lastName ?? "",
+        firstName: currentOrder?.customer?.firstName ?? "",
+        lastName: currentOrder?.customer?.lastName ?? "",
         emailAddress: email,
       });
-      await setOrderShippingMethod(locale, selectedShippingMethod);
-    } catch (e: any) {
+      // Update selected shipping method because it may have changed due to the customer form submission
+      await refreshAndSelectDefaultShippingMethod();
+    } catch (err: unknown) {
       $notification.set({
-        message: e?.message ?? "An unexpected error occurred",
+        message: (err as Error)?.message ?? "An unexpected error occurred",
         type: "error",
       });
     } finally {
@@ -79,22 +75,29 @@ export function CheckoutForm({
   }
 
   /**
-   * Set shipping and billing address
+   * Debounce the customer form submit by 300ms
    */
-  async function handleAddressFormSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  const debounceHandleCustomerFormSubmit = useMemo(
+    () => debounce(handleCustomerFormSubmit, 300),
+    [],
+  );
+
+  /**
+   * Set shipping and billing address. Accepts form so it's safe to call from debounced handler (event is recycled).
+   */
+  async function handleAddressFormSubmit(form: HTMLFormElement) {
     setLoading(true);
     const locale = window.__locale;
-    const form = new FormData(e.currentTarget);
-    const get = (key: string) => (form.get(key) as string) ?? "";
+    const formData = new FormData(form);
+    const get = (key: string) => (formData.get(key) as string) ?? "";
     try {
       const firstName = get("firstName");
       const lastName = get("lastName");
-      // Set customer again, because we now have first and last name too
+      const currentOrder = $activeOrder.get();
       await setCustomerForOrder(locale, {
-        firstName: firstName,
-        lastName: lastName,
-        emailAddress: order?.customer?.emailAddress ?? "",
+        firstName,
+        lastName,
+        emailAddress: currentOrder?.customer?.emailAddress ?? "",
       });
       await setOrderShippingAddress(locale, {
         fullName: [firstName, lastName].filter(Boolean).join(" "),
@@ -105,17 +108,22 @@ export function CheckoutForm({
         postalCode: get("postalCode"),
         countryCode: get("countryCode"),
       });
-      // TODO implement billing address if set
-      await setOrderShippingMethod(locale, selectedShippingMethod);
-    } catch (e: any) {
+      // Update selected shipping method because it may have changed due to the customer form submission
+      await refreshAndSelectDefaultShippingMethod();
+    } catch (err: unknown) {
       $notification.set({
-        message: e?.message ?? "An unexpected error occurred",
+        message: (err as Error)?.message ?? "An unexpected error occurred",
         type: "error",
       });
     } finally {
       setLoading(false);
     }
   }
+
+  const debounceHandleAddressFormSubmit = useMemo(
+    () => debounce(handleAddressFormSubmit, 300),
+    [],
+  );
 
   /**
    * Update the shipping method on the order in Vendure
@@ -136,6 +144,28 @@ export function CheckoutForm({
     }
   }
 
+  /**
+   * Gets the eligible shipping methods for the current order and
+   * selects the first method if no eligible method is currently selected on the order
+   */
+  async function refreshAndSelectDefaultShippingMethod() {
+    const locale = window.__locale;
+    const eligibleMethods = await getEligibleShippingMethods(locale);
+    setEligibleShippingMethods(eligibleMethods);
+    // Use current order from store (closure 'order' can be stale after address/method updates)
+    const currentOrder = $activeOrder.get();
+    let selectedMethodId = eligibleMethods.find(
+      (m) => m.id === currentOrder?.shippingLines?.[0]?.shippingMethod?.id,
+    )?.id;
+    if (!selectedMethodId) {
+      // If the order's shipping method is not currently eligible, select the first method
+      selectedMethodId = eligibleMethods[0].id;
+    }
+    setSelectedShippingMethod(selectedMethodId);
+    await setOrderShippingMethod(locale, selectedMethodId);
+  }
+
+  const order = useStore($activeOrder);
   return (
     <div className="lg:grid lg:grid-cols-2 lg:gap-x-12 xl:gap-x-16">
       {/* Left column div */}
@@ -143,7 +173,10 @@ export function CheckoutForm({
         {/* Contact information */}
         <form
           id="customer-form"
-          onSubmit={handleCustomerFormSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            debounceHandleCustomerFormSubmit(e.currentTarget);
+          }}
           onChange={(e) => e.currentTarget.requestSubmit()}
         >
           <h2 className="text-lg">{m.checkout_contactInformation({})}</h2>
@@ -168,14 +201,17 @@ export function CheckoutForm({
         {/* Shipping and billing address */}
         <form
           id="address-form"
-          onSubmit={handleAddressFormSubmit}
+          onSubmit={(e) => {
+            e.preventDefault();
+            debounceHandleAddressFormSubmit(e.currentTarget);
+          }}
           onChange={(e) => {
             const form = e.currentTarget;
             const requiredFields = Array.from(
               form.querySelectorAll("[required]"),
             ) as (HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement)[];
-            const allFilled = requiredFields.every((field) =>
-              field.value.trim().length > 0,
+            const allFilled = requiredFields.every(
+              (field) => field.value.trim().length > 0,
             );
             if (allFilled) {
               form.requestSubmit();

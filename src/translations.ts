@@ -28,7 +28,7 @@ const nl = {
     checkout_country: "Land",
     checkout_postalCode: "Postcode",
     checkout_deliveryMethod: "Verzendmethode",
-    checkout_confirmOrder: "Bestelling bevestigen",
+    checkout_confirmOrder: "€ Betalen",
     checkout_processing: "Bezig met verwerken...",
 }
 
