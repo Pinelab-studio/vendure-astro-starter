@@ -7,6 +7,7 @@ import CollectionCard from "../../components/CollectionCard.astro";
 import Footer from "../../components/Footer.astro";
 import { getNavigationCollections } from "../../lib/server/collection-service";
 import { getPopularProducts } from "../../lib/server/product-service";
+import ContentLayout from "../../layouts/ContentLayout.astro";
 
 const collections = await getNavigationCollections(Astro.locals.locale);
 const products = await getPopularProducts(Astro.locals.locale);
@@ -23,60 +24,58 @@ const products = await getPopularProducts(Astro.locals.locale);
     buttonHref="#"
   />
 
-  <main>
-    <!-- Product section -->
-    <section
-      aria-labelledby="product-heading"
-      class="mx-auto my-20 max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8"
-    >
-      <h2 id="category-heading" class="text-2xl font-bold tracking-tight">
-        Popular products
-      </h2>
+  <ContentLayout>
+    <main>
+      <!-- Product section -->
+      <section aria-labelledby="product-heading">
+        <h2 id="category-heading" class="text-2xl font-bold tracking-tight">
+          Popular products
+        </h2>
 
-      <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-8">
-        {
-          [...products, ...products].map((product) => (
-            // FIXME, duplicated because we only have 2 products
-            <ProductCard
-              client:load
-              slug={product.slug}
-              image={product.featuredAsset?.preview ?? ""}
-              title={product.name}
-              price={product.variants[0].priceWithTax}
-              variants={product.variants}
-            />
-          ))
-        }
-      </div>
-    </section>
+        <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-8">
+          {
+            [...products, ...products].map((product) => (
+              // FIXME, duplicated because we only have 2 products
+              <ProductCard
+                client:load
+                slug={product.slug}
+                image={product.featuredAsset?.preview ?? ""}
+                title={product.name}
+                price={product.variants[0].priceWithTax}
+                variants={product.variants}
+              />
+            ))
+          }
+        </div>
+      </section>
+      <!-- Collection section -->
+      <section
+        aria-labelledby="collection-heading"
+        class="mt-20"
+      >
+        <h2 id="collection-heading" class="text-2xl font-bold tracking-tight">
+          Shop by Collection
+        </h2>
+        <p class="mt-4 text-base opacity-70">
+          Each season, we collaborate with world-class designers to create a
+          collection inspired by the natural world.
+        </p>
 
-    <!-- Collection section -->
-    <section
-      aria-labelledby="collection-heading"
-      class="mx-auto my-20 max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8"
-    >
-      <h2 id="collection-heading" class="text-2xl font-bold tracking-tight">
-        Shop by Collection
-      </h2>
-      <p class="mt-4 text-base opacity-70">
-        Each season, we collaborate with world-class designers to create a
-        collection inspired by the natural world.
-      </p>
-
-      <div class="mt-10 grid gap-4 lg:grid-cols-3 lg:gap-8">
-        {
-          collections.map((collection) => (
-            <CollectionCard
-              href={`/c/${collection.slug}`}
-              image={`${collection.featuredAsset?.preview}?preset=small&format=webp`}
-              title={collection.name}
-              description={collection.description}
-            />
-          ))
-        }
-      </div>
-    </section>
-  </main>
+        <div class="mt-10 grid gap-4 lg:grid-cols-3 lg:gap-8">
+          {
+            collections.map((collection) => (
+              <CollectionCard
+                href={`/c/${collection.slug}`}
+                image={`${collection.featuredAsset?.preview}`}
+                title={collection.name}
+                description={collection.description}
+              />
+            ))
+          }
+        </div>
+      </section>
+    </main>
+  </ContentLayout>
 
   <Footer />
 </BaseLayout>

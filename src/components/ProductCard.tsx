@@ -30,7 +30,7 @@ export function ProductCard({ slug, image, title, price, variants }: Props) {
     <a href={`/p/${slug}`} className="group bg-base-200 block w-full min-w-0">
       <figure className="relative aspect-square">
         <img
-          src={`${image}?preset=small&format=webp`}
+          src={`${image}`}
           alt={title}
           className="rounded-box h-full w-full object-cover"
         />

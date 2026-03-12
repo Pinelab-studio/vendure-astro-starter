@@ -2,9 +2,13 @@ import request from "graphql-request";
 import { readFragment, type ResultOf } from "gql.tada";
 import { vendureApi } from "../../config";
 import { graphql } from "../../graphql/graphql";
+import { SwrCache } from "../util/swr-cache";
+
+const cache = new SwrCache();
+const PRODUCTS_CACHE_TTL = 1000 * 60 * 60;
 
 const ProductDetailFragment = graphql(`
-  fragment ProductDetail on Product {
+  fragment ProductDetail on Product @_unmask {
     id
     name
     slug
@@ -52,6 +56,16 @@ const ProductDetailFragment = graphql(`
         preview
       }
     }
+    collections {
+        id
+        name
+        slug
+        breadcrumbs {
+          id
+          name
+          slug
+        }
+      }
   }
 `);
 
@@ -68,6 +82,17 @@ const PopularProductsQuery = graphql(
   [ProductDetailFragment],
 );
 
+const ProductBySlugQuery = graphql(
+  `
+    query GetProductBySlug($slug: String!) {
+      product(slug: $slug) {
+        ...ProductDetail
+      }
+    }
+  `,
+  [ProductDetailFragment],
+);
+
 export type ProductDetail = NonNullable<ResultOf<typeof ProductDetailFragment>>;
 
 /**
@@ -75,13 +100,22 @@ export type ProductDetail = NonNullable<ResultOf<typeof ProductDetailFragment>>;
  */
 export async function getPopularProducts(
   locale: string,
+  limit: number = 4,
 ): Promise<ProductDetail[]> {
-  const result = await request(vendureApi(locale), PopularProductsQuery, {
-    limit: 4,
+  const getPopularProducts = () => request(vendureApi(locale), PopularProductsQuery, {
+    limit,
   });
-  return (
-    result.products.items.map((item) =>
-      readFragment(ProductDetailFragment, item),
-    ) ?? []
-  );
+  const { products: { items } } = await cache.get(`popular-products-${limit}`, getPopularProducts, PRODUCTS_CACHE_TTL);
+  return items;
+}
+
+export async function getProductBySlug(
+  locale: string,
+  slug: string,
+): Promise<ProductDetail | null> {
+  const getProductBySlug = () => request(vendureApi(locale), ProductBySlugQuery, {
+    slug,
+  });
+  const { product } = await cache.get(`product-${slug}`, getProductBySlug, PRODUCTS_CACHE_TTL);
+  return product;
 }

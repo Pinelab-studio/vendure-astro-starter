@@ -70,7 +70,7 @@ export function CartModal() {
             <div key={line.id} className="flex gap-4">
               {line.featuredAsset && (
                 <img
-                  src={line.featuredAsset.preview + "?preset=small&format=webp"}
+                  src={line.featuredAsset.preview}
                   alt={line.productVariant.name}
                   className="h-25 w-25 rounded object-cover"
                 />
