@@ -30,6 +30,7 @@ const nl = {
     checkout_deliveryMethod: "Verzendmethode",
     checkout_confirmOrder: "€ Betalen",
     checkout_processing: "Bezig met verwerken...",
+    checkout_rememberMe: "Onthoud mijn gegevens voor de volgende keer",
 }
 
 const en: typeof nl = {
@@ -64,6 +65,7 @@ const en: typeof nl = {
     checkout_deliveryMethod: "Delivery method",
     checkout_confirmOrder: "Confirm order",
     checkout_processing: "Processing...",
+    checkout_rememberMe: "Remember my details for next time",
 }
 
 export const translations = {nl, en};

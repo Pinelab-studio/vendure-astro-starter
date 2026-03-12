@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { debounce } from "../lib/debounce";
 import {
   type ShippingMethodQuote,
@@ -9,9 +9,15 @@ import {
   setOrderShippingAddress,
   setOrderShippingMethod,
   transitionOrderToState,
+  createMolliePaymentIntent,
 } from "../client/order-service";
 import type { AvailableCountry } from "../server/global-settings-service";
-import { $activeOrder, $notification, m } from "../client/store";
+import {
+  $activeOrder,
+  $notification,
+  $savedCheckoutDetails,
+  m,
+} from "../client/store";
 import { formatMoney } from "../lib/format-money";
 import { CartSummary } from "./CartSummary";
 
@@ -26,10 +32,35 @@ export function CheckoutForm({
   const [selectedShippingMethod, setSelectedShippingMethod] =
     useState<string>("");
   const [loading, setLoading] = useState(false);
+  const customerFormRef = useRef<HTMLFormElement | null>(null);
+  const addressFormRef = useRef<HTMLFormElement | null>(null);
+
+  // Form defaults: order first, then persistent store, then empty
+  const defaults = useMemo(() => {
+    try {
+      const o = $activeOrder.get();
+      const s = $savedCheckoutDetails.get();
+      return {
+        email: o?.customer?.emailAddress ?? s?.emailAddress ?? "",
+        firstName: o?.customer?.firstName ?? s?.firstName ?? "",
+        lastName: o?.customer?.lastName ?? s?.lastName ?? "",
+        company: o?.shippingAddress?.company ?? s?.company ?? "",
+        streetLine1: o?.shippingAddress?.streetLine1 ?? s?.streetLine1 ?? "",
+        streetLine2: o?.shippingAddress?.streetLine2 ?? s?.streetLine2 ?? "",
+        city: o?.shippingAddress?.city ?? s?.city ?? "",
+        postalCode: o?.shippingAddress?.postalCode ?? s?.postalCode ?? "",
+        countryCode: o?.shippingAddress?.countryCode ?? s?.countryCode ?? "NL",
+      };
+    } catch (error) {
+      console.error(error);
+      // Never throw when we can't get defaults from store
+      return {};
+    }
+  }, []);
 
   // Set selected shipping method in form based on order and eligible shipping methods
   useEffect(() => {
-    refreshAndSelectDefaultShippingMethod();
+    selectEligibleShippingMethod();
   }, []);
 
   if (!$activeOrder.get()?.totalQuantity) {
@@ -44,10 +75,8 @@ export function CheckoutForm({
     );
   }
 
-  const addr = $activeOrder.get()?.shippingAddress;
-
   /**
-   * Set customer on order (email only). Accepts form so it's safe to call from debounced handler (event is recycled).
+   * Set customer on order (email only)
    */
   async function handleCustomerFormSubmit(form: HTMLFormElement) {
     setLoading(true);
@@ -63,7 +92,7 @@ export function CheckoutForm({
         emailAddress: email,
       });
       // Update selected shipping method because it may have changed due to the customer form submission
-      await refreshAndSelectDefaultShippingMethod();
+      await selectEligibleShippingMethod();
     } catch (err: unknown) {
       $notification.set({
         message: (err as Error)?.message ?? "An unexpected error occurred",
@@ -83,7 +112,7 @@ export function CheckoutForm({
   );
 
   /**
-   * Set shipping and billing address. Accepts form so it's safe to call from debounced handler (event is recycled).
+   * Set shipping and billing address. Accepts form and shouldRemember so it's safe to call from debounced handler.
    */
   async function handleAddressFormSubmit(form: HTMLFormElement) {
     setLoading(true);
@@ -108,8 +137,25 @@ export function CheckoutForm({
         postalCode: get("postalCode"),
         countryCode: get("countryCode"),
       });
+      if (get("rememberMe") === "on") {
+        // Save in persistent atom
+        $savedCheckoutDetails.set({
+          emailAddress: currentOrder?.customer?.emailAddress ?? "",
+          firstName,
+          lastName,
+          company: get("company") || "",
+          streetLine1: get("streetLine1"),
+          streetLine2: get("streetLine2") || "",
+          city: get("city"),
+          postalCode: get("postalCode"),
+          countryCode: get("countryCode"),
+        });
+      } else {
+        // Remove from persistent atom
+        $savedCheckoutDetails.set(null);
+      }
       // Update selected shipping method because it may have changed due to the customer form submission
-      await refreshAndSelectDefaultShippingMethod();
+      await selectEligibleShippingMethod();
     } catch (err: unknown) {
       $notification.set({
         message: (err as Error)?.message ?? "An unexpected error occurred",
@@ -146,23 +192,64 @@ export function CheckoutForm({
 
   /**
    * Gets the eligible shipping methods for the current order and
-   * selects the first method if no eligible method is currently selected on the order
+   * selects the first method if no eligible method is currently selected on the order.
+   *
+   * This ensures we always have an eligible shipping method selected.
    */
-  async function refreshAndSelectDefaultShippingMethod() {
+  async function selectEligibleShippingMethod() {
     const locale = window.__locale;
     const eligibleMethods = await getEligibleShippingMethods(locale);
     setEligibleShippingMethods(eligibleMethods);
-    // Use current order from store (closure 'order' can be stale after address/method updates)
+    // Use current order from store (closure order can be stale after address/method updates)
     const currentOrder = $activeOrder.get();
-    let selectedMethodId = eligibleMethods.find(
+    let orderShippingMethodId = eligibleMethods.find(
       (m) => m.id === currentOrder?.shippingLines?.[0]?.shippingMethod?.id,
     )?.id;
-    if (!selectedMethodId) {
+    if (!orderShippingMethodId) {
       // If the order's shipping method is not currently eligible, select the first method
-      selectedMethodId = eligibleMethods[0].id;
+      orderShippingMethodId = eligibleMethods[0].id;
     }
-    setSelectedShippingMethod(selectedMethodId);
-    await setOrderShippingMethod(locale, selectedMethodId);
+    if (orderShippingMethodId == selectedShippingMethod) {
+      // If the method is already selected, don't do anything
+      return;
+    }
+    setSelectedShippingMethod(orderShippingMethodId);
+    await setOrderShippingMethod(locale, orderShippingMethodId);
+  }
+
+  /**
+   * Validates customer and address forms, re-submits both to the order, creates a Mollie payment intent,
+   * then redirects the user to Mollie hosted checkout.
+   */
+  async function handleConfirmOrder() {
+    const customerForm = customerFormRef.current;
+    const addressForm = addressFormRef.current;
+    if (!customerForm || !addressForm) return;
+
+    const customerValid = customerForm.checkValidity();
+    const addressValid = addressForm.checkValidity();
+
+    if (!customerValid || !addressValid) {
+      customerForm.reportValidity();
+      addressForm.reportValidity();
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const locale = window.__locale;
+      const currentOrder = $activeOrder.get();
+      const redirectUrl = `https://${window.location.host}/order/${currentOrder?.code}`;
+      const url = await createMolliePaymentIntent(locale, { redirectUrl });
+      window.location.href = url;
+    } catch (err: unknown) {
+      $notification.set({
+        message: (err as Error)?.message ?? "An unexpected error occurred",
+        type: "error",
+      });
+    } finally {
+      setLoading(false);
+    }
   }
 
   const order = useStore($activeOrder);
@@ -173,11 +260,14 @@ export function CheckoutForm({
         {/* Contact information */}
         <form
           id="customer-form"
+          ref={customerFormRef}
           onSubmit={(e) => {
             e.preventDefault();
             debounceHandleCustomerFormSubmit(e.currentTarget);
           }}
-          onChange={(e) => e.currentTarget.requestSubmit()}
+          onChange={(e) => {
+            e.currentTarget.requestSubmit();
+          }}
         >
           <h2 className="text-lg">{m.checkout_contactInformation({})}</h2>
           <div className="mt-4">
@@ -191,8 +281,8 @@ export function CheckoutForm({
                 name="email"
                 autoComplete="email"
                 required
-                defaultValue={order?.customer?.emailAddress ?? ""}
-                className="input border-base-content/20 w-full border"
+                defaultValue={defaults.email}
+                className="input w-full"
               />
             </div>
           </div>
@@ -201,11 +291,13 @@ export function CheckoutForm({
         {/* Shipping and billing address */}
         <form
           id="address-form"
+          ref={addressFormRef}
           onSubmit={(e) => {
             e.preventDefault();
             debounceHandleAddressFormSubmit(e.currentTarget);
           }}
           onChange={(e) => {
+            // Only submit if all required fields are filled
             const form = e.currentTarget;
             const requiredFields = Array.from(
               form.querySelectorAll("[required]"),
@@ -232,8 +324,8 @@ export function CheckoutForm({
                   name="firstName"
                   autoComplete="given-name"
                   required
-                  defaultValue={order?.customer?.firstName ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.firstName}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -248,8 +340,8 @@ export function CheckoutForm({
                   name="lastName"
                   autoComplete="family-name"
                   required
-                  defaultValue={order?.customer?.lastName ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.lastName}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -262,8 +354,8 @@ export function CheckoutForm({
                   id="company"
                   type="text"
                   name="company"
-                  defaultValue={addr?.company ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.company}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -278,8 +370,8 @@ export function CheckoutForm({
                   name="postalCode"
                   autoComplete="postal-code"
                   required
-                  defaultValue={addr?.postalCode ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.postalCode}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -293,8 +385,8 @@ export function CheckoutForm({
                   type="text"
                   name="streetLine2"
                   required
-                  defaultValue={addr?.streetLine2 ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.streetLine2}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -309,8 +401,8 @@ export function CheckoutForm({
                   name="streetLine1"
                   autoComplete="street-address"
                   required
-                  defaultValue={addr?.streetLine1 ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.streetLine1}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -325,8 +417,8 @@ export function CheckoutForm({
                   name="city"
                   autoComplete="address-level2"
                   required
-                  defaultValue={addr?.city ?? ""}
-                  className="input border-base-content/20 w-full border"
+                  defaultValue={defaults.city}
+                  className="input w-full"
                 />
               </div>
             </div>
@@ -340,8 +432,8 @@ export function CheckoutForm({
                   name="countryCode"
                   autoComplete="country"
                   required
-                  defaultValue={addr?.countryCode ?? "NL"}
-                  className="select border-base-content/20 w-full border"
+                  defaultValue={defaults.countryCode}
+                  className="select w-full"
                 >
                   {availableCountries.map((c) => (
                     <option key={c.code} value={c.code}>
@@ -351,12 +443,23 @@ export function CheckoutForm({
                 </select>
               </div>
             </div>
+            <div className="form-control mt-6">
+              <label className="label cursor-pointer justify-start gap-2">
+                <input
+                  id="rememberMe"
+                  name="rememberMe"
+                  type="checkbox"
+                  className="checkbox checkbox-sm bg-base-100"
+                />
+                <span className="label-text">{m.checkout_rememberMe({})}</span>
+              </label>
+            </div>
           </div>
         </form>
 
-        {/* Delivery method */}
+        {/* Shipping methods */}
         {eligibleShippingMethods.length > 0 && (
-          <div className="border-base-300 mt-10 border-t pt-10">
+          <div className="mt-10 pt-10">
             <fieldset>
               <legend className="text-lg">
                 {m.checkout_deliveryMethod({})}
@@ -365,10 +468,10 @@ export function CheckoutForm({
                 {eligibleShippingMethods.map((method) => (
                   <label
                     key={method.id}
-                    className={`group relative flex cursor-pointer rounded-lg border p-4 ${
+                    className={`group bg-base-100 relative flex cursor-pointer rounded-lg p-4 ${
                       selectedShippingMethod === method.id
-                        ? "border-primary ring-primary ring-2"
-                        : "border-base-300"
+                        ? "ring-primary ring-2"
+                        : ""
                     }`}
                   >
                     <input
@@ -415,7 +518,7 @@ export function CheckoutForm({
       <div className="mt-10 lg:mt-0">
         <h2 className="text-lg">{m.orderSummary({})}</h2>
         <div className="my-6 space-y-4">
-          {order.lines.map((line) => (
+          {order?.lines.map((line) => (
             <div key={line.id} className="flex gap-4">
               <div className="flex-1">
                 <h4 className="font-semibold">{line.productVariant.name}</h4>
@@ -429,11 +532,12 @@ export function CheckoutForm({
             </div>
           ))}
 
-          <CartSummary order={order} />
+          <CartSummary className="bg-base-100" order={order} />
 
           <button
-            type="submit"
+            type="button"
             disabled={loading}
+            onClick={handleConfirmOrder}
             className="btn btn-primary w-full"
           >
             {loading ? (

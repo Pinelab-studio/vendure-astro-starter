@@ -215,3 +215,18 @@ export const EligiblePaymentMethodsQuery = graphql(`
     }
   }
 `);
+
+export const CreateMolliePaymentIntentMutation = graphql(`
+  mutation CreateMolliePaymentIntent($input: MolliePaymentIntentInput!) {
+    createMolliePaymentIntent(input: $input) {
+      ... on MolliePaymentIntent {
+        url
+      }
+      ... on MolliePaymentIntentError {
+        errorCode
+        message
+      }
+    }
+  }
+`);
+

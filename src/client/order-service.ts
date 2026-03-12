@@ -1,4 +1,4 @@
-import { type ResultOf } from "gql.tada";
+import { type ResultOf, type VariablesOf } from "gql.tada";
 import { getErrorMessage, isErrorResult, type ErrorResult } from "../lib/error-util";
 import {
   ActiveOrderFragment,
@@ -14,6 +14,7 @@ import {
   TransitionOrderToStateMutation,
   AddPaymentToOrderMutation,
   EligiblePaymentMethodsQuery,
+  CreateMolliePaymentIntentMutation,
 } from "./order-queries";
 import { $activeOrder, $cartOpen, $notification, m } from "./store";
 import { vendureClient } from "./vendure-client";
@@ -98,12 +99,10 @@ export async function removeCouponCode(locale: string, couponCode: string): Prom
   $activeOrder.set(removeCouponCode as unknown as ActiveOrder);
 }
 
-// Checkout-related types
-
 export type ShippingMethodQuote = ResultOf<typeof EligibleShippingMethodsQuery>["eligibleShippingMethods"][number];
 export type EligiblePaymentMethod = ResultOf<typeof EligiblePaymentMethodsQuery>["eligiblePaymentMethods"][number];
-
-// Checkout-related functions
+type MolliePaymentIntentResult = ResultOf<typeof CreateMolliePaymentIntentMutation>["createMolliePaymentIntent"];
+type MolliePaymentIntentInput = VariablesOf<typeof CreateMolliePaymentIntentMutation>["input"];
 
 export async function setCustomerForOrder(locale: string, input: {
   firstName: string;
@@ -194,4 +193,26 @@ export async function getEligiblePaymentMethods(locale: string): Promise<Eligibl
     EligiblePaymentMethodsQuery
   );
   return eligiblePaymentMethods;
+}
+
+/**
+ * Creates a Mollie payment intent for the active order and returns the hosted checkout URL.
+ * Redirect the user to this URL to complete payment on Mollie.
+ * @param locale - Storefront locale (used for the GraphQL client).
+ * @returns The Mollie checkout URL to redirect to.
+ * @throws On MolliePaymentIntentError or request failure.
+ */
+export async function createMolliePaymentIntent(locale: string, input: MolliePaymentIntentInput): Promise<string> {
+  const { createMolliePaymentIntent: result } = await vendureClient(locale).request(
+    CreateMolliePaymentIntentMutation,
+    { input }
+  );
+  if ('errorCode' in result) {
+    const errorResult = result as ErrorResult;
+    const message = result.message ?? "Unable to create Mollie payment.";
+    $notification.set({ message, type: "error" });
+    throw new Error(message);
+  }
+
+  return (result as Extract<MolliePaymentIntentResult, { __typename?: "MolliePaymentIntent" }>).url;
 }

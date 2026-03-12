@@ -23,6 +23,28 @@ export const $notification = atom<Notification | null>(null);
  */
 export const $cartOpen = atom<boolean>(false);
 
+/**
+ * Saved checkout details (customer + address) when "remember me" is checked.
+ * Used to pre-fill the checkout form on next visit.
+ */
+export interface SavedCheckoutDetails {
+  emailAddress: string;
+  firstName: string;
+  lastName: string;
+  company: string;
+  streetLine1: string;
+  streetLine2: string;
+  city: string;
+  postalCode: string;
+  countryCode: string;
+}
+
+export const $savedCheckoutDetails = persistentAtom<SavedCheckoutDetails | null>(
+  "savedCheckoutDetails",
+  null,
+  { encode: JSON.stringify, decode: JSON.parse }
+);
+
 
 
 

@@ -96,7 +96,7 @@ export function CartModal() {
             </div>
           ))}
 
-          <CartSummary order={activeOrder} />
+          <CartSummary className="bg-base-200" order={activeOrder} />
 
           <CartModalCoupon couponCodes={activeOrder.couponCodes} />
 
