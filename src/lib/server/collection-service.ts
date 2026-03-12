@@ -1,6 +1,11 @@
 import request from "graphql-request";
-import { graphql } from "gql.tada";
+import { graphql, type ResultOf } from "gql.tada";
 import { vendureApi } from "../../config";
+import { SwrCache } from "../util/swr-cache";
+
+export const cache = new SwrCache();
+
+export type NavigationCollection = NonNullable<ResultOf<typeof CollectionsList>>["collections"]["items"][number];
 
 const CollectionsList = graphql(`
   query {
@@ -29,9 +34,9 @@ const CollectionsList = graphql(`
 /**
  * Get the top level collections with children for the navigation
  */
-export async function getNavigationCollections(locale: string) {
-  const {
-    collections: { items },
-  } = await request(vendureApi(locale), CollectionsList);
+export async function getNavigationCollections(locale: string): Promise<NavigationCollection[]> {
+  const ttl = 1000 * 60 * 5; // 5 minutes
+  const getNavigationCollections = () => request(vendureApi(locale), CollectionsList);
+  const { collections: { items } } = await cache.get(locale, getNavigationCollections, ttl);
   return items;
 }

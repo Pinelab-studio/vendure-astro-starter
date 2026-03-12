@@ -9,14 +9,14 @@ type Entry<T> = {
   ttlMs?: number;
 };
 
-export class SwrCache<V = unknown> {
-  private entries = new Map<string, Entry<V>>();
+export class SwrCache {
+  private entries = new Map<string, Entry<unknown>>();
   private inFlight = new Map<string, Promise<void>>();
 
   /**
    * Set a value in the cache.
    */
-  private set(key: string, value: V, ttlMs?: number): void {
+  private set<V>(key: string, value: V, ttlMs?: number): void {
     const expiresAt = ttlMs != null ? Date.now() + ttlMs : Infinity;
     this.entries.set(key, { value, expiresAt, ttlMs });
   }
@@ -26,7 +26,7 @@ export class SwrCache<V = unknown> {
    * If entry exists but is stale, return stale value immediately and revalidates in background (deduplicated).
    * `ttlMs` controls the lifetime of the cached value when it is (re)fetched.
    */
-  async get(key: string, fetcher: () => Promise<V>, ttlMs: number): Promise<V> {
+  async get<V>(key: string, fetcher: () => Promise<V>, ttlMs: number): Promise<V> {
     const entry = this.entries.get(key);
     const now = Date.now();
     const shouldRevalidate = !entry || entry.expiresAt < now;
@@ -34,7 +34,7 @@ export class SwrCache<V = unknown> {
     if (!entry) {
       // If no entry exists, await fetch and set the value in the cache and return it
       await this.revalidate(key, fetcher, ttlMs);
-      return this.entries.get(key)!.value;
+      return this.entries.get(key)!.value as V;
     }
 
     // If entry exists but is stale, revalidate in background
@@ -43,10 +43,10 @@ export class SwrCache<V = unknown> {
       this.revalidate(key, fetcher, effectiveTtl);
     }
 
-    return entry.value;
+    return entry.value as V;
   }
 
-  private revalidate(
+  private revalidate<V>(
     key: string,
     fetcher: () => Promise<V>,
     ttlMs: number,

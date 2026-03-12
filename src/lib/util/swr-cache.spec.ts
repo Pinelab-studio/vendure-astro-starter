@@ -18,7 +18,7 @@ function createFetcher(): {
 }
 
 it("when cache is empty, awaits fetch and returns value", async () => {
-  const cache = new SwrCache<number>();
+  const cache = new SwrCache();
   const { fetcher, callCount } = createFetcher();
 
   expect(await cache.get(CACHE_KEY, fetcher, 0)).toBe(1);
@@ -26,7 +26,7 @@ it("when cache is empty, awaits fetch and returns value", async () => {
 });
 
 it("returns stale value immediately and refreshes in background when ttl=0", async () => {
-  const cache = new SwrCache<number>();
+  const cache = new SwrCache();
   const { fetcher, callCount } = createFetcher();
 
   // Fetch and cache
@@ -34,7 +34,7 @@ it("returns stale value immediately and refreshes in background when ttl=0", asy
   expect(callCount()).toBe(1);
 
   // Wait for entry to become stale
-  await new Promise((r) => setTimeout(r, 100));
+  await new Promise((r) => setTimeout(r, 150));
 
   // Fetching again returns stale value (1) immediately and triggers background refresh
   expect(await cache.get(CACHE_KEY, fetcher, 99), "second fetch").toBe(1);
@@ -48,7 +48,7 @@ it("returns stale value immediately and refreshes in background when ttl=0", asy
 });
 
 it("deduplicates concurrent fetches for the same key", async () => {
-  const cache = new SwrCache<number>();
+  const cache = new SwrCache();
   const { fetcher, callCount } = createFetcher();
 
   const [result1, result2, result3] = await Promise.all([
