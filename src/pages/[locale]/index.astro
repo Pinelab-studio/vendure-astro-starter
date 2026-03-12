@@ -5,14 +5,14 @@ import Hero from "../../components/Hero.astro";
 import { ProductCard } from "../../components/ProductCard";
 import CollectionCard from "../../components/CollectionCard.astro";
 import Footer from "../../components/Footer.astro";
-import { getNavigationCollections } from "../../server/collection-service";
-import { getPopularProducts } from "../../server/product-service";
+import { getNavigationCollections } from "../../lib/server/collection-service";
+import { getPopularProducts } from "../../lib/server/product-service";
 
 const collections = await getNavigationCollections(Astro.locals.locale);
 const products = await getPopularProducts(Astro.locals.locale);
 ---
 
-<BaseLayout title="Astro", metaTitle="Astro", metaDescription="Astro">
+<BaseLayout title="Astro" , metaTitle="Astro" , metaDescription="Astro">
   <Navigation />
 
   <Hero
@@ -27,32 +27,33 @@ const products = await getPopularProducts(Astro.locals.locale);
     <!-- Product section -->
     <section
       aria-labelledby="product-heading"
-      class="mx-auto max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 my-20"
+      class="mx-auto my-20 max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8"
     >
       <h2 id="category-heading" class="text-2xl font-bold tracking-tight">
         Popular products
       </h2>
 
       <div class="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-8">
-
-        {[...products, ...products].map((product) => (
-          // FIXME, duplicated because we only have 2 products
-          <ProductCard client:load
-            slug={product.slug}
-            image={product.featuredAsset?.preview ?? ""}
-            title={product.name}
-            price={product.variants[0].priceWithTax}
-            variants={product.variants}
-          />
-        ))}
-        
+        {
+          [...products, ...products].map((product) => (
+            // FIXME, duplicated because we only have 2 products
+            <ProductCard
+              client:load
+              slug={product.slug}
+              image={product.featuredAsset?.preview ?? ""}
+              title={product.name}
+              price={product.variants[0].priceWithTax}
+              variants={product.variants}
+            />
+          ))
+        }
       </div>
     </section>
 
     <!-- Collection section -->
     <section
       aria-labelledby="collection-heading"
-      class="mx-auto max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 my-20"
+      class="mx-auto my-20 max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8"
     >
       <h2 id="collection-heading" class="text-2xl font-bold tracking-tight">
         Shop by Collection
@@ -63,14 +64,16 @@ const products = await getPopularProducts(Astro.locals.locale);
       </p>
 
       <div class="mt-10 grid gap-4 lg:grid-cols-3 lg:gap-8">
-        {collections.map((collection) => (
-          <CollectionCard
-            href={`/c/${collection.slug}`}
-            image={`${collection.featuredAsset?.preview}?preset=small&format=webp`}
-            title={collection.name}
-            description={collection.description}
-          />
-        ))}
+        {
+          collections.map((collection) => (
+            <CollectionCard
+              href={`/c/${collection.slug}`}
+              image={`${collection.featuredAsset?.preview}?preset=small&format=webp`}
+              title={collection.name}
+              description={collection.description}
+            />
+          ))
+        }
       </div>
     </section>
   </main>

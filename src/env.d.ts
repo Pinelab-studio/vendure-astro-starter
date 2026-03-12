@@ -1,4 +1,3 @@
-
 interface ImportMetaEnv {
   /**
    * Random secret to prevent unauthorized cache invalidation calls
@@ -17,9 +16,7 @@ declare namespace App {
     locale: string;
     /// Type inference from the locales.ts file
     messages: Messages;
-    m: import("./lib/locale-util").LocaleMessageFunctions<
-      Messages
-    >;
+    m: import("./lib/util/locale-util").LocaleMessageFunctions<Messages>;
   }
 }
 

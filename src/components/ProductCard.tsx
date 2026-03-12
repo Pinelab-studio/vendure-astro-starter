@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { formatMoney } from "../lib/format-money";
-import { addItemToOrder } from "../client/order-service";
+import { formatMoney } from "../lib/util/format-money";
+import { addItemToOrder } from "../lib/client/order-service";
 import { ArrowUpRight } from "./icons/ArrowUpRight";
 import { Plus } from "./icons/Plus";
-import type { ProductDetail } from "../server/product-service";
+import type { ProductDetail } from "../lib/server/product-service";
 
 interface Props {
   slug: string;

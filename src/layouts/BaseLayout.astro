@@ -31,13 +31,19 @@ const { title, metaTitle, metaDescription } = Astro.props;
 </html>
 
 <!-- Pass messages for current locale to the client -->
-<script define:vars={{ messages: translations[Astro.locals.locale as keyof typeof translations], locale: Astro.locals.locale }}>
+<script
+  define:vars={{
+    messages: translations[Astro.locals.locale as keyof typeof translations],
+    locale: Astro.locals.locale,
+  }}
+  is:inline
+>
   window.__messages = messages;
   window.__locale = locale;
 </script>
 
 <script>
-  import { getActiveOrder } from "../client/order-service";
+  import { getActiveOrder } from "../lib/client/order-service";
   // Fetch active order client-side on every page load
   getActiveOrder(window.__locale).catch(console.error);
 </script>

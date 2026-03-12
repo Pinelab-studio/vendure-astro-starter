@@ -16,7 +16,9 @@ const { image, title, description, buttonText, buttonHref } = Astro.props;
   </div>
   <div aria-hidden="true" class="bg-neutral absolute inset-0 opacity-80"></div>
 
-  <div class="hero-content text-neutral-content relative z-0 py-32 text-center sm:py-64">
+  <div
+    class="hero-content text-neutral-content relative z-0 py-32 text-center sm:py-64"
+  >
     <div class="max-w-3xl">
       <h1 class="text-4xl font-bold tracking-tight lg:text-6xl">{title}</h1>
       <p class="mt-4 text-xl">{description}</p>

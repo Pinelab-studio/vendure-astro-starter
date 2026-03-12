@@ -5,14 +5,12 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "format": "prettier --write . && astro check --minimumFailingSeverity hint",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check",
-    "test": "vitest --run",
-    "format": "prettier --write ."
+    "test": "vitest --run"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.6",
     "@astrojs/node": "^9.5.2",
     "@astrojs/react": "^4.4.2",
     "@fontsource/sen": "^5.2.8",
@@ -32,6 +30,7 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.6",
     "prettier": "3.8.1",
     "prettier-plugin-astro": "0.14.1",
     "prettier-plugin-tailwindcss": "^0.7.2",

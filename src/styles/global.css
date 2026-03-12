@@ -11,7 +11,6 @@
   font-family: "Sen", sans-serif;
 }
 
-
 body {
   overflow-x: clip; /* clip hides overflow without breaking position:sticky on mobile */
 }
@@ -42,7 +41,7 @@ body {
   --color-secondary-content: oklch(26% 0 0);
   --color-accent: oklch(87% 0 0);
   --color-accent-content: oklch(26% 0 0);
-  --color-neutral:oklch(0.26 0.0063 78.22);
+  --color-neutral: oklch(0.26 0.0063 78.22);
   --color-neutral-content: oklch(1 0 none);
   --color-info: oklch(44% 0.11 240.79);
   --color-info-content: oklch(90% 0.058 230.902);
@@ -52,7 +51,7 @@ body {
   --color-warning-content: oklch(92% 0.12 95.746);
   --color-error: oklch(44% 0.177 26.899);
   --color-error-content: oklch(88% 0.062 18.334);
-  --radius-selector: 0.50rem;
+  --radius-selector: 0.5rem;
   --radius-field: 2rem;
   --radius-box: 1rem;
   --size-selector: 0.25rem;
@@ -61,5 +60,3 @@ body {
   --depth: 0;
   --noise: 0;
 }
-
-  

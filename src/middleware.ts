@@ -1,5 +1,5 @@
 import { defineMiddleware, sequence } from "astro:middleware";
-import { createMessageFn } from "./lib/locale-util";
+import { createMessageFn } from "./lib/util/locale-util";
 import { translations } from "./translations";
 import { ENABLED_LOCALES, DEFAULT_LOCALE } from "./config";
 

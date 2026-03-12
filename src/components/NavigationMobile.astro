@@ -52,13 +52,16 @@ const { collections, base } = Astro.props;
         if (hasChildren) {
           const collapseId = `mobile-collapse-${collection.id}`;
           return (
-            <div class="collapse collapse-arrow bg-neutral">
+            <div class="collapse-arrow bg-neutral collapse">
               <input type="checkbox" id={collapseId} />
-              <label for={collapseId} class="collapse-title text-neutral-content min-h-0 p-0 py-2 cursor-pointer">
+              <label
+                for={collapseId}
+                class="collapse-title text-neutral-content min-h-0 cursor-pointer p-0 py-2"
+              >
                 {collection.name}
               </label>
-              <div class="collapse-content text-sm text-neutral-content px-0 pt-0">
-                <div class="pl-4 space-y-1">
+              <div class="collapse-content text-neutral-content px-0 pt-0 text-sm">
+                <div class="space-y-1 pl-4">
                   {children.map((child) => (
                     <a
                       href={`${base}/collection/${child.slug}`}
@@ -74,7 +77,10 @@ const { collections, base } = Astro.props;
         }
 
         return (
-          <a href={link} class="link link-hover text-neutral-content block py-2">
+          <a
+            href={link}
+            class="link link-hover text-neutral-content block py-2"
+          >
             {collection.name}
           </a>
         );

@@ -1,9 +1,16 @@
-import { formatMoney } from "../lib/format-money";
-import { m } from "../client/store";
-import type { ActiveOrder } from "../client/order-service";
+import { formatMoney } from "../lib/util/format-money";
+import { m } from "../lib/client/store";
+import type { ActiveOrder } from "../lib/client/order-service";
 
-export function CartSummary({ order, className }: { order: ActiveOrder | null, className?: string }) {
-  const subTotalWithoutDiscounts = order?.lines.reduce((acc, line) => acc + line.linePriceWithTax, 0) ?? 0;
+export function CartSummary({
+  order,
+  className,
+}: {
+  order: ActiveOrder | null;
+  className?: string;
+}) {
+  const subTotalWithoutDiscounts =
+    order?.lines.reduce((acc, line) => acc + line.linePriceWithTax, 0) ?? 0;
   return (
     <div className={`rounded-box space-y-2 p-4 ${className}`}>
       <div className="flex justify-between">
@@ -11,7 +18,7 @@ export function CartSummary({ order, className }: { order: ActiveOrder | null, c
         <span>{formatMoney(subTotalWithoutDiscounts)}</span>
       </div>
       {order?.discounts?.map((discount, i) => (
-        <div key={i} className="flex justify-between text-success">
+        <div key={i} className="text-success flex justify-between">
           <span>{discount.description}</span>
           <span>{formatMoney(discount.amountWithTax)}</span>
         </div>

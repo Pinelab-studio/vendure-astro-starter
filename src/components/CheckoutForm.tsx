@@ -1,24 +1,22 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { debounce } from "../lib/debounce";
 import {
   type ShippingMethodQuote,
-  addPaymentToOrder,
+  createMolliePaymentIntent,
   getEligibleShippingMethods,
   setCustomerForOrder,
   setOrderShippingAddress,
   setOrderShippingMethod,
-  transitionOrderToState,
-  createMolliePaymentIntent,
-} from "../client/order-service";
-import type { AvailableCountry } from "../server/global-settings-service";
+} from "../lib/client/order-service";
 import {
   $activeOrder,
   $notification,
   $savedCheckoutDetails,
   m,
-} from "../client/store";
-import { formatMoney } from "../lib/format-money";
+} from "../lib/client/store";
+import type { AvailableCountry } from "../lib/server/global-settings-service";
+import { debounce } from "../lib/util/debounce";
+import { formatMoney } from "../lib/util/format-money";
 import { CartSummary } from "./CartSummary";
 
 export function CheckoutForm({

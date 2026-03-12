@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/react";
-import { $notification } from "../client/store";
+import { $notification } from "../lib/client/store";
 
 export type Notification = {
   message: string;
@@ -33,14 +33,14 @@ export function Notification() {
   }, 5000);
 
   return (
-    <section className="fixed left-0 right-0 top-16 z-20">
-      <div className="mx-auto max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8 my-4">
+    <section className="fixed top-16 right-0 left-0 z-20">
+      <div className="mx-auto my-4 max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <div
           role="alert"
-          className={`alert ${alertTypeClass[notification.type]} flex flex-col sm:flex-row items-start sm:items-center gap-2`}
+          className={`alert ${alertTypeClass[notification.type]} flex flex-col items-start gap-2 sm:flex-row sm:items-center`}
         >
           <div dangerouslySetInnerHTML={{ __html: notification.message }} />
-          <div className="flex gap-2 ml-auto">
+          <div className="ml-auto flex gap-2">
             {notification.cta && (
               <button
                 type="button"

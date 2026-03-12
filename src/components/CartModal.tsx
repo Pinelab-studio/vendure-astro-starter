@@ -1,8 +1,8 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useRef, useState } from "react";
-import { $activeOrder, $cartOpen, m } from "../client/store";
-import { removeOrderLine } from "../client/order-service";
-import { formatMoney } from "../lib/format-money";
+import { $activeOrder, $cartOpen, m } from "../lib/client/store";
+import { removeOrderLine } from "../lib/client/order-service";
+import { formatMoney } from "../lib/util/format-money";
 import { CartModalCoupon } from "./CartModalCoupon";
 import { CartSummary } from "./CartSummary";
 import { CartQuantitySelector } from "./CartQuantitySelector";
@@ -30,7 +30,7 @@ export function CartModal() {
       <dialog ref={dialogRef} className="modal" onClose={close}>
         <div className="modal-box flex flex-col items-center justify-center">
           <button
-            className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+            className="btn btn-sm btn-circle btn-ghost absolute top-2 right-2"
             type="button"
             onClick={close}
           >

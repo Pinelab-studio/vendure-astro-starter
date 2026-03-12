@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { adjustOrderLine, removeOrderLine } from "../client/order-service";
-import { m } from "../client/store";
+import { adjustOrderLine, removeOrderLine } from "../lib/client/order-service";
+import { m } from "../lib/client/store";
 
 interface QuantitySelectorProps {
   orderLineId: string;

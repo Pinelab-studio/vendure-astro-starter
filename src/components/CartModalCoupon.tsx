@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { m } from "../client/store";
-import { applyCouponCode, removeCouponCode } from "../client/order-service";
+import { m } from "../lib/client/store";
+import { applyCouponCode, removeCouponCode } from "../lib/client/order-service";
 
 export function CartModalCoupon({ couponCodes }: { couponCodes: string[] }) {
   const [code, setCode] = useState("");
@@ -36,7 +36,9 @@ export function CartModalCoupon({ couponCodes }: { couponCodes: string[] }) {
             {m.apply()}
           </button>
         </div>
-        {hasError && <p className="text-error text-sm">{m.invalidCouponCode()}</p>}
+        {hasError && (
+          <p className="text-error text-sm">{m.invalidCouponCode()}</p>
+        )}
         {couponCodes.length > 0 && (
           <div className="flex flex-wrap gap-2">
             {couponCodes.map((c) => (
