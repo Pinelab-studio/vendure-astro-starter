@@ -1,0 +1,92 @@
+---
+import { BreadcrumbSlash } from "./icons/BreadcrumbSlash";
+import { Home } from "./icons/Home";
+
+type Breadcrumb = {
+  id: string;
+  name: string;
+  slug: string;
+};
+
+interface Props {
+  paths: Breadcrumb[];
+  currentPage: string;
+}
+
+const { paths, currentPage } = Astro.props as Props;
+
+const visiblePaths = paths.filter((item) => item.name !== "__root_collection__");
+
+const locale = Astro.locals.locale;
+const base = `/${locale}`;
+
+const parent = visiblePaths[visiblePaths.length - 1];
+---
+
+<div class="py-6 sm:py-12">
+  {parent && 
+  // On mobile we only show the first parent to save space
+  (
+    <nav
+      aria-label="Breadcrumb mobile"
+      class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:hidden"
+    >
+      <a
+        href={`${base}/collection/${parent.slug}`}
+        class="inline-flex items-center text-sm font-medium text-base-content"
+      >
+        <span class="mr-2">&lt;</span>
+        <span>{parent.name}</span>
+      </a>
+    </nav>
+  )}
+
+  <nav
+    aria-label="Breadcrumb"
+    class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 hidden sm:block"
+  >
+    <ol role="list" class="flex items-center space-x-4">
+      <li>
+        <div class="flex items-center">
+          <a
+            href={`${base}/`}
+            class="mr-4 text-sm font-medium text-base-content"
+          >
+            <Home className="h-4" />
+          </a>
+          {(visiblePaths.length > 0 || currentPage) && (
+            <BreadcrumbSlash className="h-5 w-auto" />
+          )}
+        </div>
+      </li>
+
+      {
+        visiblePaths.map((item, index) => (
+          <li>
+            <div class="flex items-center">
+              <a
+                href={`${base}/collection/${item.slug}`}
+                class="mr-4 text-sm font-medium text-base-content"
+              >
+                {item.name}
+              </a>
+              <BreadcrumbSlash className="h-5 w-auto" />
+            </div>
+          </li>
+        ))
+      }
+
+      <li class="text-sm">
+        <div class="flex items-center">
+          <span
+            aria-current="page"
+            class="font-medium text-base-content/70"
+          >
+            {currentPage}
+          </span>
+        </div>
+      </li>
+    </ol>
+  </nav>
+</div>
+

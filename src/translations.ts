@@ -11,11 +11,11 @@ const nl = {
   checkout: "Verder naar bestellen",
   remove: "Verwijderen",
   close: "Sluiten",
-  couponCode: "Kortingscode",
   apply: "Toepassen",
-  invalidCouponCode: "Ongeldige kortingscode",
   more: "Meer",
   cartEmpty: "Je winkelwagen is leeg",
+  checkout_invalidCouponCode: "Ongeldige kortingscode",
+  checkout_couponCode: "Kortingscode",
   checkout_contactInformation: "Contactgegevens",
   checkout_emailAddress: "E-mailadres",
   checkout_shippingInformation: "Verzendgegevens",
@@ -31,6 +31,8 @@ const nl = {
   checkout_confirmOrder: "€ Betalen",
   checkout_processing: "Bezig met verwerken...",
   checkout_rememberMe: "Onthoud mijn gegevens voor de volgende keer",
+  pdp_addToCart: "In winkelwagen",
+  pdp_soldOut: "Uitverkocht",
 };
 
 const en: typeof nl = {
@@ -46,9 +48,9 @@ const en: typeof nl = {
   checkout: "Checkout",
   remove: "Remove",
   close: "Close",
-  couponCode: "Coupon code",
+  checkout_couponCode: "Coupon code",
   apply: "Apply",
-  invalidCouponCode: "Invalid coupon code",
+  checkout_invalidCouponCode: "Invalid coupon code",
   more: "More",
   cartEmpty: "Your cart is empty",
   checkout_contactInformation: "Contact information",
@@ -66,6 +68,8 @@ const en: typeof nl = {
   checkout_confirmOrder: "Confirm order",
   checkout_processing: "Processing...",
   checkout_rememberMe: "Remember my details for next time",
+  pdp_addToCart: "Add to cart",
+  pdp_soldOut: "Sold out",
 };
 
 export const translations = { nl, en };

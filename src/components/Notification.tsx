@@ -37,10 +37,13 @@ export function Notification() {
       <div className="mx-auto my-4 max-w-xl px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <div
           role="alert"
-          className={`alert ${alertTypeClass[notification.type]} flex flex-col items-start gap-2 sm:flex-row sm:items-center`}
+          className={`alert ${alertTypeClass[notification.type]} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2`}
         >
-          <div dangerouslySetInnerHTML={{ __html: notification.message }} />
-          <div className="ml-auto flex gap-2">
+          <div
+            className="whitespace-normal break-words"
+            dangerouslySetInnerHTML={{ __html: notification.message }}
+          />
+          <div className="flex justify-end gap-2">
             {notification.cta && (
               <button
                 type="button"

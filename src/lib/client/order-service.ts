@@ -51,7 +51,7 @@ export async function addItemToOrder(
     throw error;
   }
   $activeOrder.set(addItemToOrder as unknown as ActiveOrder);
-  const variant = $activeOrder.get()?.lines[0].productVariant.name!;
+  const variant = $activeOrder.get()?.lines.find(line => line.productVariant.id == productVariantId)?.productVariant.name ?? "";
   $notification.set({
     message: m.itemAddedToCart({ variant }),
     type: "success",

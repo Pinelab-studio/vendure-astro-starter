@@ -15,7 +15,6 @@ declare namespace App {
   interface Locals {
     locale: string;
     /// Type inference from the locales.ts file
-    messages: Messages;
     m: import("./lib/util/locale-util").LocaleMessageFunctions<Messages>;
   }
 }
