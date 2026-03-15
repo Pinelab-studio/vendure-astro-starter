@@ -40,7 +40,7 @@ export function Notification() {
           className={`alert ${alertTypeClass[notification.type]} grid grid-cols-[minmax(0,1fr)_auto] items-center gap-2`}
         >
           <div
-            className="whitespace-normal break-words"
+            className="break-words whitespace-normal"
             dangerouslySetInnerHTML={{ __html: notification.message }}
           />
           <div className="flex justify-end gap-2">

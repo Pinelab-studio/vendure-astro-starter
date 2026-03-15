@@ -15,7 +15,9 @@ interface Props {
 
 const { paths, currentPage } = Astro.props as Props;
 
-const visiblePaths = paths.filter((item) => item.name !== "__root_collection__");
+const visiblePaths = paths.filter(
+  (item) => item.name !== "__root_collection__",
+);
 
 const locale = Astro.locals.locale;
 const base = `/${locale}`;
@@ -24,39 +26,42 @@ const parent = visiblePaths[visiblePaths.length - 1];
 ---
 
 <div class="py-6 sm:py-12">
-  {parent && 
-  // On mobile we only show the first parent to save space
-  (
-    <nav
-      aria-label="Breadcrumb mobile"
-      class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 sm:hidden"
-    >
-      <a
-        href={`${base}/collection/${parent.slug}`}
-        class="inline-flex items-center text-sm font-medium text-base-content"
+  {
+    parent && (
+      // On mobile we only show the first parent to save space
+      <nav
+        aria-label="Breadcrumb mobile"
+        class="mx-auto max-w-7xl px-4 sm:hidden sm:px-6 lg:px-8"
       >
-        <span class="mr-2">&lt;</span>
-        <span>{parent.name}</span>
-      </a>
-    </nav>
-  )}
+        <a
+          href={`${base}/collection/${parent.slug}`}
+          class="text-base-content inline-flex items-center text-sm font-medium"
+        >
+          <span class="mr-2">&lt;</span>
+          <span>{parent.name}</span>
+        </a>
+      </nav>
+    )
+  }
 
   <nav
     aria-label="Breadcrumb"
-    class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 hidden sm:block"
+    class="mx-auto hidden max-w-7xl px-4 sm:block sm:px-6 lg:px-8"
   >
     <ol role="list" class="flex items-center space-x-4">
       <li>
         <div class="flex items-center">
           <a
             href={`${base}/`}
-            class="mr-4 text-sm font-medium text-base-content"
+            class="text-base-content mr-4 text-sm font-medium"
           >
             <Home className="h-4" />
           </a>
-          {(visiblePaths.length > 0 || currentPage) && (
-            <BreadcrumbSlash className="h-5 w-auto" />
-          )}
+          {
+            (visiblePaths.length > 0 || currentPage) && (
+              <BreadcrumbSlash className="h-5 w-auto" />
+            )
+          }
         </div>
       </li>
 
@@ -66,7 +71,7 @@ const parent = visiblePaths[visiblePaths.length - 1];
             <div class="flex items-center">
               <a
                 href={`${base}/collection/${item.slug}`}
-                class="mr-4 text-sm font-medium text-base-content"
+                class="text-base-content mr-4 text-sm font-medium"
               >
                 {item.name}
               </a>
@@ -78,10 +83,7 @@ const parent = visiblePaths[visiblePaths.length - 1];
 
       <li class="text-sm">
         <div class="flex items-center">
-          <span
-            aria-current="page"
-            class="font-medium text-base-content/70"
-          >
+          <span aria-current="page" class="text-base-content/70 font-medium">
             {currentPage}
           </span>
         </div>
@@ -89,4 +91,3 @@ const parent = visiblePaths[visiblePaths.length - 1];
     </ol>
   </nav>
 </div>
-

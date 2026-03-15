@@ -21,7 +21,9 @@ export function CartModalCoupon({ couponCodes }: { couponCodes: string[] }) {
   return (
     <div className="collapse-arrow bg-base-200 collapse">
       <input type="checkbox" />
-      <div className="collapse-title font-medium">{m.checkout_couponCode()}</div>
+      <div className="collapse-title font-medium">
+        {m.checkout_couponCode()}
+      </div>
       <div className="collapse-content space-y-2">
         <div className="join w-full">
           <input

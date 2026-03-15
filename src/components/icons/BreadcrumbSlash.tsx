@@ -15,4 +15,3 @@ export function BreadcrumbSlash(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-

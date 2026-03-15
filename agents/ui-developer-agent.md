@@ -37,6 +37,7 @@ return <div>
   ))}
 </div>
 ```
+
 - When designing UI components, break down complex interfaces into smaller, reusable subcomponents. This makes your code more modular and maintainable. For example: a `ProductListingPage` can have `ProductCards` and `ProductFilter`.
 - For example, if you are building a filterable product table, you can separate it into the following subcomponents:
 

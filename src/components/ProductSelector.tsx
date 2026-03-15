@@ -11,8 +11,12 @@ type ProductSelectorProps = {
   moreLabel: string;
 };
 
-export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLabel }: ProductSelectorProps) {
-
+export function ProductSelector({
+  product,
+  addToCartLabel,
+  soldOutLabel,
+  moreLabel,
+}: ProductSelectorProps) {
   // Use the lowest-priced variant as a stable default
   const defaultVariant = useMemo(() => {
     if (product.variants.length === 0) {
@@ -24,17 +28,17 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLab
   }, [product.variants]);
 
   // Map of optionGroupId -> optionId for the current selection
-  const [selectedOptions, setSelectedOptions] = useState<Record<string, string>>(
-    () => {
-      const initial: Record<string, string> = {};
-      if (defaultVariant) {
-        for (const option of defaultVariant.options) {
-          initial[option.group.id] = option.id;
-        }
+  const [selectedOptions, setSelectedOptions] = useState<
+    Record<string, string>
+  >(() => {
+    const initial: Record<string, string> = {};
+    if (defaultVariant) {
+      for (const option of defaultVariant.options) {
+        initial[option.group.id] = option.id;
       }
-      return initial;
-    },
-  );
+    }
+    return initial;
+  });
 
   // Derive the currently "active" variant and whether the exact selection is sold out
   const { currentVariant, soldOut } = useMemo(() => {
@@ -77,7 +81,12 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLab
       currentVariant: exactMatch ?? partialMatch ?? fallbackVariant,
       soldOut: allGroupsSelected && !exactMatch,
     };
-  }, [defaultVariant, product.optionGroups.length, product.variants, selectedOptions]);
+  }, [
+    defaultVariant,
+    product.optionGroups.length,
+    product.variants,
+    selectedOptions,
+  ]);
 
   const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
@@ -102,7 +111,8 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLab
     }
   }
 
-  const price = currentVariant?.priceWithTax ?? defaultVariant?.priceWithTax ?? 0;
+  const price =
+    currentVariant?.priceWithTax ?? defaultVariant?.priceWithTax ?? 0;
 
   return (
     <div className="mt-6 space-y-6">
@@ -129,9 +139,7 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLab
                       key={option.id}
                       type="button"
                       className={`btn btn-sm ${
-                        isSelected
-                          ? "border-base-content"
-                          : "border-base-300"
+                        isSelected ? "border-base-content" : "border-base-300"
                       }`}
                       onClick={() => handleSelectOption(group.id, option.id)}
                     >
@@ -154,14 +162,16 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLab
         />
         <button
           type="button"
-          className="btn btn-primary flex-1 min-w-0"
+          className="btn btn-primary min-w-0 flex-1"
           onClick={handleAddToCart}
           disabled={adding || !currentVariant || soldOut}
         >
           {adding ? (
             <span className="loading loading-spinner loading-sm" />
+          ) : soldOut ? (
+            `${soldOutLabel}`
           ) : (
-            soldOut ? `${soldOutLabel}` : addToCartLabel
+            addToCartLabel
           )}
         </button>
       </div>

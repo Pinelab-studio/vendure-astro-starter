@@ -14,6 +14,7 @@ You implement TypeScript business logic and make components display actual data 
 - **No `useMemo` in React:** Do not use `useMemo` (or `useCallback` for pure performance). Prefer plain functions and values; extract computations to utils if needed.
 - Use `Astro.locals.m` to get translations and labels. For example: `Astro.locals.m.itemAddedToCart({ variant: "T-Shirt" })`.
 - Pass translations to components as props. For example:
+
 ```Astro
 <ProductSelector addToCartLabel={Astro.locals.m.pdp_addToCart()} />
 ```
@@ -31,11 +32,11 @@ You implement TypeScript business logic and make components display actual data 
 
 ## Util, calculations and helpers
 
-- Utility functions, calculations and helpers, etc. go in `src/lib/util/`. 
+- Utility functions, calculations and helpers, etc. go in `src/lib/util/`.
 - Write unit tests for complex utils. Utils can be used both on client and server side.
 - Pure functions only. No side effects.
 - Utilities should be usable on both client and server side, so no dependencies on `window`, `document` or `Astro` objects.
-              
+
 ## Vitest unit tests for utils
 
 - Add a `*.spec.ts` next to the module (e.g. `src/lib/util/my-util.spec.ts`).

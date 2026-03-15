@@ -1,7 +1,7 @@
 import { graphql } from "../../graphql/graphql";
 
 export const ActiveOrderFragment = graphql(`
-  fragment ActiveOrder on Order {
+  fragment ActiveOrder on Order @_unmask {
     __typename
     id
     code

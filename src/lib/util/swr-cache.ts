@@ -26,7 +26,11 @@ export class SwrCache {
    * If entry exists but is stale, return stale value immediately and revalidates in background (deduplicated).
    * `ttlMs` controls the lifetime of the cached value when it is (re)fetched.
    */
-  async get<V>(key: string, fetcher: () => Promise<V>, ttlMs: number): Promise<V> {
+  async get<V>(
+    key: string,
+    fetcher: () => Promise<V>,
+    ttlMs: number,
+  ): Promise<V> {
     const entry = this.entries.get(key);
     const now = Date.now();
     const shouldRevalidate = !entry || entry.expiresAt < now;

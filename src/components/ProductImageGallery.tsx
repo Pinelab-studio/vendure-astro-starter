@@ -43,7 +43,7 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
                 key={asset.id}
                 type="button"
                 className={`bg-base-200 relative flex aspect-square w-full cursor-pointer items-center justify-center rounded-lg ${
-                  index === activeIndex ? "ring-2 ring-primary" : ""
+                  index === activeIndex ? "ring-primary ring-2" : ""
                 }`}
                 onClick={() => setActiveIndex(index)}
               >
@@ -76,4 +76,3 @@ export function ProductImageGallery({ product }: ProductImageGalleryProps) {
     </div>
   );
 }
-

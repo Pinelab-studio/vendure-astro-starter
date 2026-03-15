@@ -6,8 +6,8 @@ import { ENABLED_LOCALES, DEFAULT_LOCALE } from "./config";
 const i18nMiddleware = defineMiddleware(async (context, next) => {
   const pathname = context.url.pathname;
 
-  // Skip locale detection (and most of all redirection and 404 handling) for specific routes
-  if (pathname.startsWith("/_image")) {
+  // Skip locale detection for specific routes
+  if (pathname.startsWith("/_image") || pathname === "/sitemap.xml") {
     return next();
   }
 

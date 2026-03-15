@@ -7,6 +7,7 @@ This is simple starter template for building an SSR storefront for Vendure with 
 - Astro (SSR) + React
 - DaisyUI
 - TailwindCSS
+- GraphQL Tada
 
 ## Features
 
@@ -30,7 +31,6 @@ We have included a set of agents that can help you with the development of your 
 
 1. Start with a static mock up. Use this prompt for example: `You are the "@ui-developer-agent.md". Add review stars to the ProductDetailPage, and list reviews at the bottom of the page`.
 2. Implement real data, interactivity and state: `You are the "@typescript-developer-agent.md". Fetch reviews from Vendure via GraphQL and map to the reviews UI in the ProductDetailPage. Calculate the average rating based on all reviews and use the value to display the amount of stars.`.
-
 
 ## Cache invalidation
 

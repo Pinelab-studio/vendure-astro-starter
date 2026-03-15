@@ -30,8 +30,7 @@ export type ActiveOrder = NonNullable<ResultOf<typeof ActiveOrderFragment>>;
  */
 export async function getActiveOrder(locale: string): Promise<void> {
   const { activeOrder } = await vendureClient(locale).request(ActiveOrderQuery);
-  // `readFragment` has quite some TS overhead, so we handle it like this. which is fine, because it is encapsulated inside the services.
-  $activeOrder.set(activeOrder as unknown as ActiveOrder);
+  $activeOrder.set(activeOrder);
 }
 
 export async function addItemToOrder(
@@ -50,8 +49,12 @@ export async function addItemToOrder(
     $notification.set({ message: error.message, type: "error" });
     throw error;
   }
-  $activeOrder.set(addItemToOrder as unknown as ActiveOrder);
-  const variant = $activeOrder.get()?.lines.find(line => line.productVariant.id == productVariantId)?.productVariant.name ?? "";
+  $activeOrder.set(addItemToOrder as ActiveOrder);
+  const variant =
+    $activeOrder
+      .get()
+      ?.lines.find((line) => line.productVariant.id == productVariantId)
+      ?.productVariant.name ?? "";
   $notification.set({
     message: m.itemAddedToCart({ variant }),
     type: "success",
@@ -78,7 +81,7 @@ export async function adjustOrderLine(
     $notification.set({ message: error.message, type: "error" });
     return;
   }
-  $activeOrder.set(adjustOrderLine as unknown as ActiveOrder);
+  $activeOrder.set(adjustOrderLine as ActiveOrder);
 }
 
 export async function removeOrderLine(
@@ -102,7 +105,7 @@ export async function applyCouponCode(
   if (error) {
     return error;
   }
-  $activeOrder.set(applyCouponCode as unknown as ActiveOrder);
+  $activeOrder.set(applyCouponCode as ActiveOrder);
 }
 
 export async function removeCouponCode(
@@ -115,7 +118,7 @@ export async function removeCouponCode(
       $notification.set({ message: getErrorMessage(error), type: "error" });
       throw error;
     });
-  $activeOrder.set(removeCouponCode as unknown as ActiveOrder);
+  $activeOrder.set(removeCouponCode);
 }
 
 export type ShippingMethodQuote = ResultOf<
@@ -149,7 +152,7 @@ export async function setCustomerForOrder(
     $notification.set({ message: error.message, type: "error" });
     throw error;
   }
-  $activeOrder.set(setCustomerForOrder as unknown as ActiveOrder);
+  $activeOrder.set(setCustomerForOrder as ActiveOrder);
 }
 
 export async function setOrderShippingAddress(
@@ -175,7 +178,7 @@ export async function setOrderShippingAddress(
     $notification.set({ message: error.message, type: "error" });
     throw error;
   }
-  $activeOrder.set(setOrderShippingAddress as unknown as ActiveOrder);
+  $activeOrder.set(setOrderShippingAddress as ActiveOrder);
 }
 
 export async function getEligibleShippingMethods(
@@ -200,7 +203,7 @@ export async function setOrderShippingMethod(
     $notification.set({ message: error.message, type: "error" });
     throw error;
   }
-  $activeOrder.set(setOrderShippingMethod as unknown as ActiveOrder);
+  $activeOrder.set(setOrderShippingMethod as ActiveOrder);
 }
 
 export async function transitionOrderToState(
@@ -216,7 +219,7 @@ export async function transitionOrderToState(
     $notification.set({ message: error.message, type: "error" });
     throw error;
   }
-  $activeOrder.set(transitionOrderToState as unknown as ActiveOrder);
+  $activeOrder.set(transitionOrderToState as ActiveOrder);
 }
 
 export async function addPaymentToOrder(
@@ -230,7 +233,7 @@ export async function addPaymentToOrder(
   );
   const error = isErrorResult(addPaymentToOrder);
   if (error) return error.message;
-  $activeOrder.set(addPaymentToOrder as unknown as ActiveOrder);
+  $activeOrder.set(addPaymentToOrder as ActiveOrder);
 }
 
 export async function getEligiblePaymentMethods(

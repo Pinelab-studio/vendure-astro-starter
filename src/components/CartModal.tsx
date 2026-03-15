@@ -49,7 +49,10 @@ export function CartModal() {
 
   const checkoutUrl = `/${window.__locale}/checkout`;
 
-  async function handleQuantityChange(orderLineId: string, newQuantity: number) {
+  async function handleQuantityChange(
+    orderLineId: string,
+    newQuantity: number,
+  ) {
     const locale = window.__locale;
     if (newQuantity <= 0) {
       await removeOrderLine(locale, orderLineId);
@@ -99,7 +102,9 @@ export function CartModal() {
                   <QuantitySelector
                     quantity={line.quantity}
                     moreLabel={m.more()}
-                    onQuantityChange={(newQuantity) => handleQuantityChange(line.id, newQuantity)}
+                    onQuantityChange={(newQuantity) =>
+                      handleQuantityChange(line.id, newQuantity)
+                    }
                   />
                 </div>
               </div>
