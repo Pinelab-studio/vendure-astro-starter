@@ -2,14 +2,16 @@ import { useMemo, useState } from "react";
 import type { ProductDetail } from "../lib/server/product-service";
 import { formatMoney } from "../lib/util/format-money";
 import { addItemToOrder } from "../lib/client/order-service";
+import { QuantitySelector } from "./QuantitySelector";
 
 type ProductSelectorProps = {
   product: ProductDetail;
   addToCartLabel: string;
   soldOutLabel: string;
+  moreLabel: string;
 };
 
-export function ProductSelector({ product, addToCartLabel, soldOutLabel }: ProductSelectorProps) {
+export function ProductSelector({ product, addToCartLabel, soldOutLabel, moreLabel }: ProductSelectorProps) {
 
   // Use the lowest-priced variant as a stable default
   const defaultVariant = useMemo(() => {
@@ -77,7 +79,7 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel }: Produ
     };
   }, [defaultVariant, product.optionGroups.length, product.variants, selectedOptions]);
 
-  // Track add-to-cart request state to disable the button and show a spinner
+  const [quantity, setQuantity] = useState(1);
   const [adding, setAdding] = useState(false);
 
   // Update the selected option for a single option group
@@ -94,7 +96,7 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel }: Produ
     const locale = window.__locale;
     setAdding(true);
     try {
-      await addItemToOrder(locale, currentVariant.id, 1);
+      await addItemToOrder(locale, currentVariant.id, quantity);
     } finally {
       setAdding(false);
     }
@@ -143,10 +145,16 @@ export function ProductSelector({ product, addToCartLabel, soldOutLabel }: Produ
         </div>
       )}
 
-      <div className="mt-4">
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <QuantitySelector
+          moreLabel={moreLabel}
+          quantity={quantity}
+          onQuantityChange={setQuantity}
+          className="h-10 shrink-0"
+        />
         <button
           type="button"
-          className="btn btn-primary w-full"
+          className="btn btn-primary flex-1 min-w-0"
           onClick={handleAddToCart}
           disabled={adding || !currentVariant || soldOut}
         >

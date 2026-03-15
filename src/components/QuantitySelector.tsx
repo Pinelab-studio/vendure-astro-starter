@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import { adjustOrderLine, removeOrderLine } from "../lib/client/order-service";
-import { m } from "../lib/client/store";
 
 interface QuantitySelectorProps {
-  orderLineId: string;
   quantity: number;
+  moreLabel: string;
+  onQuantityChange: (newQuantity: number) => void;
   className?: string;
 }
 
@@ -14,25 +13,22 @@ const MAX_SELECT = 10;
  * A quantity selector for the cart modal.
  * Shows 0-10 as select, and "more" as number input.
  */
-export function CartQuantitySelector({
-  orderLineId,
+export function QuantitySelector({
   quantity,
+  moreLabel,
+  onQuantityChange,
   className,
 }: QuantitySelectorProps) {
   const [manualMode, setManualMode] = useState(quantity > MAX_SELECT);
-  const locale = window.__locale;
 
   useEffect(() => {
     setManualMode(quantity > MAX_SELECT);
   }, [quantity]);
 
-  async function update(newQuantity: number) {
-    if (newQuantity <= 0) {
-      await removeOrderLine(locale, orderLineId);
-    } else {
-      await adjustOrderLine(locale, orderLineId, newQuantity);
-    }
+  function emitChange(newQuantity: number) {
+    onQuantityChange(newQuantity);
   }
+
   if (manualMode) {
     return (
       <input
@@ -44,7 +40,7 @@ export function CartQuantitySelector({
         autoFocus
         onBlur={(e) => {
           const val = parseInt(e.target.value, 10);
-          if (!isNaN(val) && val > 0) update(val);
+          if (!isNaN(val) && val > 0) emitChange(val);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") (e.target as HTMLInputElement).blur();
@@ -62,7 +58,7 @@ export function CartQuantitySelector({
         if (val === "more") {
           setManualMode(true);
         } else {
-          update(parseInt(val, 10));
+          emitChange(parseInt(val, 10));
         }
       }}
     >
@@ -71,7 +67,7 @@ export function CartQuantitySelector({
           {n}
         </option>
       ))}
-      <option value="more">{m.more()}</option>
+      <option value="more">{moreLabel}</option>
     </select>
   );
 }

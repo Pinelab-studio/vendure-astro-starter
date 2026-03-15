@@ -1,11 +1,11 @@
 import { useStore } from "@nanostores/react";
 import { useEffect, useRef, useState } from "react";
 import { $activeOrder, $cartOpen, m } from "../lib/client/store";
-import { removeOrderLine } from "../lib/client/order-service";
+import { adjustOrderLine, removeOrderLine } from "../lib/client/order-service";
 import { formatMoney } from "../lib/util/format-money";
 import { CartModalCoupon } from "./CartModalCoupon";
 import { CartSummary } from "./CartSummary";
-import { CartQuantitySelector } from "./CartQuantitySelector";
+import { QuantitySelector } from "./QuantitySelector";
 import { TrashIcon } from "./TrashIcon";
 
 export function CartModal() {
@@ -49,6 +49,15 @@ export function CartModal() {
 
   const checkoutUrl = `/${window.__locale}/checkout`;
 
+  async function handleQuantityChange(orderLineId: string, newQuantity: number) {
+    const locale = window.__locale;
+    if (newQuantity <= 0) {
+      await removeOrderLine(locale, orderLineId);
+    } else {
+      await adjustOrderLine(locale, orderLineId, newQuantity);
+    }
+  }
+
   return (
     <dialog ref={dialogRef} className="modal" onClose={close}>
       <div className="modal-box max-w-2xl p-0">
@@ -87,9 +96,10 @@ export function CartModal() {
                 </div>
                 <div className="flex items-center gap-1">
                   <RemoveLineButton orderLineId={line.id} />
-                  <CartQuantitySelector
-                    orderLineId={line.id}
+                  <QuantitySelector
                     quantity={line.quantity}
+                    moreLabel={m.more()}
+                    onQuantityChange={(newQuantity) => handleQuantityChange(line.id, newQuantity)}
                   />
                 </div>
               </div>

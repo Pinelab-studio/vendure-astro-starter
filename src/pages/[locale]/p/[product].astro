@@ -14,7 +14,6 @@ const product = await getProductBySlug(
 if (!product) {
   return Astro.redirect(`/404`);
 }
-
 ---
 
 <BaseLayout
@@ -51,7 +50,13 @@ if (!product) {
           </h1>
 
           <h2 class="sr-only">Product information</h2>
-          <ProductSelector client:load product={product} addToCartLabel={Astro.locals.m.pdp_addToCart()} soldOutLabel={Astro.locals.m.pdp_soldOut()} />
+          <ProductSelector
+            client:load
+            product={product}
+            addToCartLabel={Astro.locals.m.pdp_addToCart()}
+            soldOutLabel={Astro.locals.m.pdp_soldOut()}
+            moreLabel={Astro.locals.m.more()}
+          />
 
           <div class="mt-6">
             <h3 class="sr-only">Description</h3>
