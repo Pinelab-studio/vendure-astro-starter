@@ -11,11 +11,13 @@ This is simple starter template for building an SSR storefront for Vendure with 
 
 ## Features
 
+- Multi-language
 - Storefront page
 - Product Detail pages
 - Product Listing pages
 - Checkout
 - Stale while revalidate caching (SWR)
+- Sitemap.xml
 
 ## Getting Started
 
