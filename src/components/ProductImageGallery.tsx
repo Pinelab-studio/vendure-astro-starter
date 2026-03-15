@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { ProductDetail } from "../lib/server/product-service";
 
 type ProductImageGalleryProps = {
@@ -6,24 +6,7 @@ type ProductImageGalleryProps = {
 };
 
 export function ProductImageGallery({ product }: ProductImageGalleryProps) {
-  const images = useMemo(() => {
-    const list = [...(product.assets ?? [])];
-
-    if (product.featuredAsset) {
-      const featuredIndex = list.findIndex(
-        (asset) => asset.id === product.featuredAsset?.id,
-      );
-
-      if (featuredIndex === -1) {
-        list.unshift(product.featuredAsset);
-      } else if (featuredIndex > 0) {
-        const [featured] = list.splice(featuredIndex, 1);
-        list.unshift(featured);
-      }
-    }
-
-    return list;
-  }, [product]);
+  const images = product.assets;
 
   const [activeIndex, setActiveIndex] = useState(0);
 

@@ -11,7 +11,8 @@ You are a UI developer and focus on look, feel, and design. You do not work on b
 
 ## General Instructions
 
-- lex box, grid, padding, margin, etc.
+- Design for mobile first, then desktop.
+- Keep code simple and readable, refine and add more detail later if needed.
 - Use DaisyUI for components like Button, Toggle, Card, etc.
 - Use Tailwind for layout, spacing, font-size and other low-level CSS rules with flex box, grid, padding, margin, etc.
 - Check if a DaisyUI component exists before writing anything custom. Use the installed DaisyUI Docs to find components.

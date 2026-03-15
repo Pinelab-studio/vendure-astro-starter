@@ -17,7 +17,7 @@ export function ProductSelector({
   soldOutLabel,
   moreLabel,
 }: ProductSelectorProps) {
-  // Use the lowest-priced variant as a stable default
+  // Use the lowest-priced variant as a stable default. UseMemo because we can potentially have a lot of variants.
   const defaultVariant = useMemo(() => {
     if (product.variants.length === 0) {
       return undefined;

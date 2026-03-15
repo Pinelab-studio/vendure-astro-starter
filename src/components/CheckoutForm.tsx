@@ -34,27 +34,24 @@ export function CheckoutForm({
   const addressFormRef = useRef<HTMLFormElement | null>(null);
 
   // Form defaults: order first, then persistent store, then empty
-  const defaults = useMemo(() => {
-    try {
-      const o = $activeOrder.get();
-      const s = $savedCheckoutDetails.get();
-      return {
-        email: o?.customer?.emailAddress ?? s?.emailAddress ?? "",
-        firstName: o?.customer?.firstName ?? s?.firstName ?? "",
-        lastName: o?.customer?.lastName ?? s?.lastName ?? "",
-        company: o?.shippingAddress?.company ?? s?.company ?? "",
-        streetLine1: o?.shippingAddress?.streetLine1 ?? s?.streetLine1 ?? "",
-        streetLine2: o?.shippingAddress?.streetLine2 ?? s?.streetLine2 ?? "",
-        city: o?.shippingAddress?.city ?? s?.city ?? "",
-        postalCode: o?.shippingAddress?.postalCode ?? s?.postalCode ?? "",
-        countryCode: o?.shippingAddress?.countryCode ?? s?.countryCode ?? "NL",
-      };
-    } catch (error) {
-      console.error(error);
-      // Never throw when we can't get defaults from store
-      return {};
-    }
-  }, []);
+  let defaults: Record<string, string> = {};
+  try {
+    const o = $activeOrder.get();
+    const s = $savedCheckoutDetails.get();
+    defaults = {
+      email: o?.customer?.emailAddress ?? s?.emailAddress ?? "",
+      firstName: o?.customer?.firstName ?? s?.firstName ?? "",
+      lastName: o?.customer?.lastName ?? s?.lastName ?? "",
+      company: o?.shippingAddress?.company ?? s?.company ?? "",
+      streetLine1: o?.shippingAddress?.streetLine1 ?? s?.streetLine1 ?? "",
+      streetLine2: o?.shippingAddress?.streetLine2 ?? s?.streetLine2 ?? "",
+      city: o?.shippingAddress?.city ?? s?.city ?? "",
+      postalCode: o?.shippingAddress?.postalCode ?? s?.postalCode ?? "",
+      countryCode: o?.shippingAddress?.countryCode ?? s?.countryCode ?? "NL",
+    };
+  } catch (error) {
+    console.error(error);
+  }
 
   // Set selected shipping method in form based on order and eligible shipping methods
   useEffect(() => {
